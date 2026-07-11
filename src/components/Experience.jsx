@@ -97,7 +97,7 @@ export default function Experience() {
                 <div className="fb-flow-tool">
                   {"\n"}
                   <div className="fb-flow-ring" style={{"--ring": "#00ffe7"}}>
-                    <img alt="WordPress" decoding="async" loading="lazy" src="https://cdn.simpleicons.org/wordpress/00ffe7" />
+                    <img alt="WordPress" decoding="async" loading="lazy" src="/icons/tech-wordpress.svg" />
                   </div>
                   {"\n"}
                   <small>
@@ -113,7 +113,7 @@ export default function Experience() {
                 <div className="fb-flow-tool">
                   {"\n"}
                   <div className="fb-flow-ring" style={{"--ring": "#ff2d78"}}>
-                    <img alt="Elementor" decoding="async" loading="lazy" src="https://cdn.simpleicons.org/elementor/ff2d78" />
+                    <img alt="Elementor" decoding="async" loading="lazy" src="/icons/tech-elementor.svg" />
                   </div>
                   {"\n"}
                   <small>
@@ -129,7 +129,7 @@ export default function Experience() {
                 <div className="fb-flow-tool">
                   {"\n"}
                   <div className="fb-flow-ring" style={{"--ring": "#ff7a3d"}}>
-                    <img alt="HubSpot" decoding="async" loading="lazy" src="https://cdn.simpleicons.org/hubspot/ff7a3d" />
+                    <img alt="HubSpot" decoding="async" loading="lazy" src="/icons/tech-hubspot.svg" />
                   </div>
                   {"\n"}
                   <small>
@@ -257,7 +257,7 @@ export default function Experience() {
                 <div className="fb-flow-tool">
                   {"\n"}
                   <div className="fb-flow-ring" style={{"--ring": "#f7df1e"}}>
-                    <img alt="JavaScript" decoding="async" loading="lazy" src="https://cdn.simpleicons.org/javascript/f7df1e" />
+                    <img alt="JavaScript" decoding="async" loading="lazy" src="/icons/tech-javascript.svg" />
                   </div>
                   {"\n"}
                   <small>
@@ -273,7 +273,7 @@ export default function Experience() {
                 <div className="fb-flow-tool">
                   {"\n"}
                   <div className="fb-flow-ring" style={{"--ring": "#a259ff"}}>
-                    <img alt="UI" decoding="async" loading="lazy" src="https://cdn.simpleicons.org/figma/a259ff" />
+                    <img alt="UI" decoding="async" loading="lazy" src="/icons/tech-figma.svg" />
                   </div>
                   {"\n"}
                   <small>
@@ -353,7 +353,7 @@ export default function Experience() {
                 <div className="fb-flow-tool">
                   {"\n"}
                   <div className="fb-flow-ring big-flow-icon" style={{"--ring": "#00ffe7", "width": "64px !important", "height": "64px !important", "minWidth": "64px !important"}}>
-                    <img alt="WordPress" decoding="async" loading="lazy" src="https://cdn.simpleicons.org/wordpress/00ffe7" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
+                    <img alt="WordPress" decoding="async" loading="lazy" src="/icons/tech-wordpress.svg" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
                   </div>
                   {"\n"}
                   <small>
@@ -369,7 +369,7 @@ export default function Experience() {
                 <div className="fb-flow-tool">
                   {"\n"}
                   <div className="fb-flow-ring big-flow-icon" style={{"--ring": "#FF4A00", "width": "64px !important", "height": "64px !important", "minWidth": "64px !important"}}>
-                    <img alt="Zapier" decoding="async" loading="lazy" src="https://cdn.simpleicons.org/zapier/FF4A00" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
+                    <img alt="Zapier" decoding="async" loading="lazy" src="/icons/tech-zapier.svg" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
                   </div>
                   {"\n"}
                   <small>
@@ -385,7 +385,7 @@ export default function Experience() {
                 <div className="fb-flow-tool">
                   {"\n"}
                   <div className="fb-flow-ring big-flow-icon" style={{"--ring": "#B089FF", "width": "64px !important", "height": "64px !important", "minWidth": "64px !important"}}>
-                    <img alt="Make" decoding="async" loading="lazy" src="https://cdn.simpleicons.org/make/B089FF" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
+                    <img alt="Make" decoding="async" loading="lazy" src="/icons/tech-make.svg" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
                   </div>
                   {"\n"}
                   <small>
@@ -495,7 +495,7 @@ export default function Experience() {
                 <div className="fb-flow-tool">
                   {"\n"}
                   <div className="fb-flow-ring big-flow-icon" style={{"--ring": "#00ffe7", "width": "64px !important", "height": "64px !important", "minWidth": "64px !important"}}>
-                    <img alt="WordPress" decoding="async" loading="lazy" src="https://cdn.simpleicons.org/wordpress/00ffe7" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
+                    <img alt="WordPress" decoding="async" loading="lazy" src="/icons/tech-wordpress.svg" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
                   </div>
                   {"\n"}
                   <small>
@@ -511,7 +511,7 @@ export default function Experience() {
                 <div className="fb-flow-tool">
                   {"\n"}
                   <div className="fb-flow-ring big-flow-icon" style={{"--ring": "#ff2d78", "width": "64px !important", "height": "64px !important", "minWidth": "64px !important"}}>
-                    <img alt="Elementor" decoding="async" loading="lazy" src="https://cdn.simpleicons.org/elementor/ff2d78" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
+                    <img alt="Elementor" decoding="async" loading="lazy" src="/icons/tech-elementor.svg" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
                   </div>
                   {"\n"}
                   <small>
@@ -527,7 +527,7 @@ export default function Experience() {
                 <div className="fb-flow-tool">
                   {"\n"}
                   <div className="fb-flow-ring big-flow-icon" style={{"--ring": "#a259ff", "width": "64px !important", "height": "64px !important", "minWidth": "64px !important"}}>
-                    <img alt="UI" decoding="async" loading="lazy" src="https://cdn.simpleicons.org/figma/a259ff" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
+                    <img alt="UI" decoding="async" loading="lazy" src="/icons/tech-figma.svg" style={{"width": "34px !important", "height": "34px !important", "objectFit": "contain !important", "display": "block !important"}} />
                   </div>
                   {"\n"}
                   <small>

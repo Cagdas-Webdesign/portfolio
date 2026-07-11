@@ -1,0 +1,233 @@
+/* ============================================================
+   PHASE 4 — PREMIUM UI/UX & MOTION UPGRADE
+   Loaded after phase3-sections.css. Adds: SystemFlow central
+   sculptural core, assistant CTA presence, deeper glass on the
+   Experience slider, horizontal-scroll safe area. Tasteful,
+   controlled glow — no logic changes in any component.
+   ============================================================ */
+
+/* ---------------------------------------------------------
+   1. SYSTEMFLOW — central sculptural core (the orb)
+   Floats center in phase 1, GSAP sinks it through depth in
+   phase 2 while platform cards reveal. Rings idle-rotate via
+   CSS for an "alive" feel independent of scroll.
+   --------------------------------------------------------- */
+
+.sf-core{
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: clamp(190px, 26vw, 300px);
+  height: clamp(190px, 26vw, 300px);
+  translate: -50% -50%;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  z-index: 2;                 /* below the cards (deck z-index 3), above ambient */
+  pointer-events: none;
+}
+.sf-core > span{
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+/* soft outer aura */
+.sf-core-halo{
+  inset: -34%;
+  background: radial-gradient(circle at 50% 46%,
+    rgba(123,97,255,.34), rgba(0,255,231,.14) 42%, transparent 68%);
+  filter: blur(30px);
+}
+/* glass sphere body with top inner highlight + depth shadow */
+.sf-core-sphere{
+  background:
+    radial-gradient(circle at 38% 30%, rgba(255,255,255,.28), rgba(255,255,255,.05) 26%, transparent 42%),
+    radial-gradient(circle at 62% 74%, rgba(123,97,255,.28), transparent 58%),
+    linear-gradient(160deg, rgba(18,22,40,.92), rgba(4,6,14,.96));
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow:
+    inset 0 2px 10px rgba(255,255,255,.14),
+    inset 0 -30px 60px rgba(0,0,0,.6),
+    0 40px 120px rgba(0,0,0,.6),
+    0 0 80px rgba(123,97,255,.2);
+  backdrop-filter: blur(4px);
+}
+/* orbiting rings */
+.sf-core-ring{
+  border: 1px solid transparent;
+  background: conic-gradient(from 0deg,
+    rgba(0,255,231,.5), rgba(123,97,255,.35), rgba(255,75,161,.4),
+    rgba(0,255,231,.5)) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: .55;
+}
+.sf-core-ring-1{ inset: -10%; animation: sfCoreSpin 14s linear infinite; }
+.sf-core-ring-2{ inset: -22%; transform: rotateX(72deg); animation: sfCoreSpin 22s linear infinite reverse; opacity: .4; }
+/* bright center spark */
+.sf-core-spark{
+  inset: 42%;
+  background: radial-gradient(circle, #fff, rgba(0,255,231,.7) 55%, transparent 72%);
+  filter: blur(1px);
+  animation: sfCorePulse 4.5s ease-in-out infinite;
+}
+@keyframes sfCoreSpin{ to{ transform: rotate(360deg); } }
+.sf-core-ring-2{ /* keep the tilt while spinning */
+  animation-name: sfCoreSpinTilt;
+}
+@keyframes sfCoreSpinTilt{ from{ transform: rotateX(72deg) rotate(0); } to{ transform: rotateX(72deg) rotate(360deg); } }
+@keyframes sfCorePulse{
+  0%, 100%{ opacity: .7; transform: scale(1); }
+  50%{ opacity: 1; transform: scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce){
+  .sf-core-ring-1, .sf-core-ring-2, .sf-core-spark{ animation: none; }
+}
+/* mobile: the core doesn't travel (static stack) — hide the heavy element */
+@media (max-width: 899px){
+  .sf-core{ display: none; }
+}
+
+/* ---------------------------------------------------------
+   2. ASSISTANT CTA — presence & aura (no logic touched)
+   --------------------------------------------------------- */
+
+.ai-assistant-showcase{ position: relative; }
+/* breathing intelligence aura behind the copy/CTA column */
+.ai-assistant-copy{ position: relative; }
+.ai-assistant-copy::before{
+  content: "";
+  position: absolute;
+  left: -8%;
+  top: 50%;
+  width: 420px;
+  height: 420px;
+  max-width: 90vw;
+  translate: 0 -50%;
+  background: radial-gradient(circle at 40% 40%,
+    rgba(0,255,231,.16), rgba(123,97,255,.12) 40%, transparent 70%);
+  filter: blur(46px);
+  opacity: .8;
+  pointer-events: none;
+  z-index: 0;
+  animation: aiAuraBreath 7s ease-in-out infinite;
+}
+.ai-assistant-copy > *{ position: relative; z-index: 1; }
+@keyframes aiAuraBreath{
+  0%, 100%{ opacity: .55; transform: scale(1); }
+  50%{ opacity: .85; transform: scale(1.06); }
+}
+
+/* primary CTA: premium glass pill with a soft moving glow ring */
+.ai-open-chat.ai-assistant-primary{
+  position: relative;
+  isolation: isolate;
+  transition: transform .24s cubic-bezier(.2,.7,.2,1), box-shadow .24s ease, border-color .24s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 14px 40px rgba(0,0,0,.4);
+}
+.ai-open-chat.ai-assistant-primary::after{
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(120deg, rgba(0,255,231,.7), rgba(123,97,255,.6), rgba(255,75,161,.55), rgba(0,255,231,.7));
+  background-size: 240% 240%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: .55;
+  animation: aiBtnFlow 6s linear infinite;
+  z-index: -1;
+}
+@keyframes aiBtnFlow{ to{ background-position: 240% 50%; } }
+.ai-open-chat.ai-assistant-primary:hover{
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 18px 48px rgba(0,0,0,.5), 0 0 30px rgba(0,255,231,.22);
+}
+.ai-open-chat.ai-assistant-primary:hover::after{ opacity: .9; }
+.ai-open-chat.ai-assistant-primary:active{ transform: translateY(0) scale(.985); }
+.ai-btn-icon{ transition: transform .3s cubic-bezier(.2,.7,.2,1); }
+.ai-open-chat.ai-assistant-primary:hover .ai-btn-icon{ transform: rotate(8deg) scale(1.08); }
+
+/* preview panel: a touch more glass depth + a live pulse */
+.ai-assistant-preview{
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 50px 130px rgba(0,0,0,.5);
+}
+@media (prefers-reduced-motion: reduce){
+  .ai-assistant-copy::before,
+  .ai-open-chat.ai-assistant-primary::after{ animation: none; }
+}
+
+/* ---------------------------------------------------------
+   3. EXPERIENCE SLIDER — deeper glass, refined icon rings
+   (typography/arrows/pagination already set in phase3;
+   this adds card depth + icon-container quality)
+   --------------------------------------------------------- */
+
+.fb-slide.is-active{
+  border-color: rgba(255,255,255,.13) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    0 60px 150px rgba(0,0,0,.6),
+    0 0 60px rgba(0,255,231,.05) !important;
+}
+/* icon rings: cleaner glass container, crisp local SVGs */
+.fb-flow-ring{
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,.10), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)) !important;
+  border: 1px solid color-mix(in srgb, var(--ring, #fff) 30%, rgba(255,255,255,.12)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 8px 22px rgba(0,0,0,.4),
+    0 0 20px color-mix(in srgb, var(--ring, #fff) 18%, transparent) !important;
+}
+.fb-flow-ring img{ width: 24px; height: 24px; object-fit: contain; }
+.fb-flow-ring.text span{ font-weight: 700; letter-spacing: -.01em; }
+.fb-flow-tool small{
+  font-family: var(--font-body);
+  letter-spacing: .02em;
+  color: rgba(255,255,255,.62);
+}
+
+/* ---------------------------------------------------------
+   4. HORIZONTAL SCROLL (v66) — left safe area + readability
+   Ensures panel content never hugs the viewport edge and the
+   intro reads immediately on entry.
+   --------------------------------------------------------- */
+
+#system-story-v64 .v66-layout{
+  padding-inline: clamp(24px, 6vw, 88px);
+  max-width: 1240px;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+#system-story-v64 .v66-title{ text-wrap: balance; }
+@media (max-width: 899px){
+  #system-story-v64 .v66-layout{ padding-inline: clamp(20px, 6vw, 32px); }
+}
+
+/* ---------------------------------------------------------
+   5. AUTOMATION CARDS — final depth refinement
+   --------------------------------------------------------- */
+
+.auto-card{
+  background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.015)) !important;
+}
+.auto-card::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+  pointer-events: none;
+}
+.auto-tags span{ transition: border-color .22s ease, background .22s ease; }
+.auto-card:hover .auto-tags span{ border-color: color-mix(in srgb, var(--accent) 30%, rgba(255,255,255,.12)); }
+
+/* ---------------------------------------------------------
+   6. HERO — final typographic breathing room
+   --------------------------------------------------------- */
+
+.hero-actions{ gap: 16px; margin-top: 6px; }

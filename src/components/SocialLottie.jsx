@@ -54,6 +54,9 @@ export default function SocialLottie() {
         gsap.set(card, { opacity: 0, z: -560, y: 90, x: side * 120, rotateY: side * 16, rotateX: 16, scale: .72, filter: 'blur(14px)', transformPerspective: 1100 });
       });
 
+      const core = section.querySelector('.sf-core');
+      gsap.set(core, { opacity: 0, scale: .55, y: 0, z: 0, transformPerspective: 1100 });
+
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
         scrollTrigger: {
@@ -64,11 +67,15 @@ export default function SocialLottie() {
         },
       });
 
+      // Phase 1 — the sculptural core wakes up, floating and alone
+      tl.to(core, { opacity: 1, scale: 1, duration: .09, ease: 'power2.out' }, 0);
       tl.to(head, { opacity: 1, y: 0, duration: .07, ease: 'power2.out' }, 0);
+      // Phase 2 — the core sinks downward and back through depth for the rest
+      tl.to(core, { y: () => window.innerHeight * 0.46, z: -320, scale: .5, rotateX: 14, opacity: .5, duration: .86, ease: 'power1.in' }, .12);
 
       const seg = .16;              // scroll window per card
       cards.forEach((card, i) => {
-        const at = .06 + i * seg;
+        const at = .14 + i * seg;   // cards begin after the core's solo moment
         const side = i % 2 ? 1 : -1;
         // arrive: depth -> front, slight axis rotation, blur -> sharp
         tl.fromTo(card,
@@ -103,6 +110,13 @@ export default function SocialLottie() {
           <div className="sf-ambient" aria-hidden="true" />
           <div className="sf-field" aria-hidden="true">
             <i /><i /><i />
+          </div>
+          <div className="sf-core" aria-hidden="true">
+            <span className="sf-core-halo" />
+            <span className="sf-core-sphere" />
+            <span className="sf-core-ring sf-core-ring-1" />
+            <span className="sf-core-ring sf-core-ring-2" />
+            <span className="sf-core-spark" />
           </div>
           <div className="sf-head">
             <span className="section-kicker">{"// Plattformen werden verbunden"}</span>

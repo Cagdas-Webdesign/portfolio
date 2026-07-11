@@ -8,6 +8,7 @@ import './styles/base.css';
 import './styles/patches.css';
 import './styles/phase2-polish.css';
 import './styles/phase3-sections.css';
+import './styles/phase4-premium.css';
 
 import App from './App.jsx';
 
