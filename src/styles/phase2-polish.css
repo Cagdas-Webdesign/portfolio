@@ -1,0 +1,161 @@
+/* ============================================================
+   PHASE 2 POLISH LAYER
+   Final override layer, imported after base.css + patches.css.
+   Follows the site's own patch-block convention: targeted
+   refinements only — no layout, section-order or animation
+   system changes.
+   ============================================================ */
+
+/* ---------- 1. Typographic system ----------
+   Display: Syne (unchanged — the site's identity)
+   Body:    Inter (now actually loaded; was silently falling
+            back to system fonts in ~100 existing rules)
+   Mono:    JetBrains Mono — reserved for code, kickers,
+            stats and system labels */
+
+:root{
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Long-form body copy: mono → Inter, readable size and rhythm.
+   Kickers, chips, stats and code keep their mono identity. */
+.exp-copy p,
+.reels-copy p,
+.auto-card p,
+.engine-card p,
+.engine-head p,
+.code-title p,
+.step p,
+.process p,
+.social-head p,
+.funnel-head p,
+.contact-card p{
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.7;
+  letter-spacing: .005em;
+  font-weight: 400;
+  color: rgba(255,255,255,.68);
+}
+.engine-card p{ font-size: 13px; line-height: 1.65; }
+.step p{ font-size: 12.5px; line-height: 1.6; }
+
+.trust-list div{
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .01em;
+  color: rgba(255,255,255,.72);
+}
+
+/* Micro-label legibility: nudge up the smallest sizes only */
+.chip{ font-size: 10px; letter-spacing: .09em; }
+.auto-tags span,
+.social-tools span{ font-size: 10.5px; }
+.footerline{ font-size: 10.5px; letter-spacing: .1em; }
+
+/* Heading refinement — no size/tracking changes, just better
+   rag and rendering on the existing scale */
+h1, h2, h3{
+  text-wrap: balance;
+  -webkit-font-smoothing: antialiased;
+}
+.step span{ letter-spacing: -.01em; }
+
+/* ---------- 2. Glass surfaces / gray boxes ----------
+   Consistent border brightness, a subtle top inner highlight
+   (the language .nav-cta already uses), and less muddy fills. */
+
+.step,
+.trust-list div{
+  border-color: rgba(255,255,255,.09);
+  background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055);
+}
+
+.engine-card{
+  border-color: rgba(255,255,255,.10);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 40px 120px rgba(0,0,0,.28);
+  transition: border-color .25s ease, transform .25s ease;
+}
+.engine-card:hover{
+  border-color: color-mix(in srgb, var(--accent) 28%, rgba(255,255,255,.10));
+  transform: translateY(-2px);
+}
+
+.auto-card{
+  border-color: rgba(255,255,255,.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 70px 180px rgba(0,0,0,.55);
+}
+
+.contact-card{
+  border-color: rgba(255,255,255,.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 60px 160px rgba(0,0,0,.42);
+}
+
+.chip,
+.auto-tags span,
+.social-tools span{
+  background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* ---------- 3. Sliders, pagination, control buttons ---------- */
+
+/* Experience slider dots: smooth state changes + hover cue
+   (active glow / inactive tone already come from patch layers) */
+.fb-dot{
+  transition: opacity .25s ease, width .3s ease, background .25s ease, box-shadow .3s ease;
+}
+.fb-dot:not(.is-active):hover{ background: rgba(255,255,255,.65); }
+
+/* Slider arrows + reel nav: visible hover/press feedback */
+.fb-arrow,
+.reel-nav button{
+  transition: background .22s ease, border-color .22s ease, transform .22s ease;
+}
+.fb-arrow:hover,
+.reel-nav button:hover{
+  background: rgba(255,255,255,.09);
+  border-color: rgba(255,255,255,.22);
+}
+.fb-arrow:active,
+.reel-nav button:active{ transform: scale(.94); }
+
+/* ---------- 4. Buttons & links ---------- */
+
+.contact-links a{
+  transition: background .22s ease, border-color .22s ease, transform .22s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.contact-links a:hover{
+  background: rgba(255,255,255,.09);
+  border-color: rgba(255,255,255,.24);
+  transform: translateY(-1px);
+}
+.nav-cta:hover{
+  background: rgba(255,255,255,.09);
+  border-color: rgba(255,255,255,.26);
+}
+
+/* ---------- 5. Accessibility polish ---------- */
+
+button:focus-visible,
+a:focus-visible{
+  outline: 2px solid rgba(0,255,231,.55);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .engine-card,
+  .engine-card:hover,
+  .contact-links a,
+  .contact-links a:hover,
+  .fb-arrow:active,
+  .reel-nav button:active{
+    transition: none;
+    transform: none;
+  }
+}

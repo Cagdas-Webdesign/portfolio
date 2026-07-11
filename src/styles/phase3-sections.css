@@ -1,0 +1,401 @@
+/* ============================================================
+   PHASE 3 — TARGETED SECTION IMPROVEMENTS
+   Loaded after phase2-polish.css. Section-scoped refinements:
+   hero typography, Apple-Intelligence cert glow, SystemFlow 3D,
+   v66 horizontal showcase, experience slider, automation cards.
+   ============================================================ */
+
+/* ---------------------------------------------------------
+   1. HERO — editorial typography, same structure
+   --------------------------------------------------------- */
+
+.hero-sub{
+  font-family: var(--font-body);
+  font-size: clamp(14px, 1.35vw, 16.5px);
+  line-height: 1.75;
+  letter-spacing: .005em;
+  font-weight: 400;
+  color: rgba(255,255,255,.66);
+  margin: 30px auto 42px;
+}
+.hero-actions .btn{
+  font-weight: 700;
+  letter-spacing: .035em;
+  font-size: 13px;
+}
+.hero-actions .btn-text{ letter-spacing: .035em; }
+.hero-badge{
+  letter-spacing: .07em;
+  color: rgba(255,255,255,.64);
+  border-color: rgba(255,255,255,.09);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+.hero-code{ opacity: .8; }
+
+/* ---------------------------------------------------------
+   2. CERT — Apple Intelligence aura
+   Same scroll mechanics (block-07 drives --smokeRot/--smokeAlpha),
+   recolored to a calm cyan→blue→violet→magenta→pink spectrum,
+   softer and wider, with a quiet idle breath.
+   --------------------------------------------------------- */
+
+.ai-cert-smoke::before{
+  background:
+    conic-gradient(from var(--smokeRot),
+      rgba(90,200,250,.62),
+      rgba(64,120,255,.55),
+      rgba(133,102,255,.66),
+      rgba(191,90,242,.58),
+      rgba(255,100,180,.55),
+      rgba(120,190,255,.50),
+      rgba(90,200,250,.62)
+    );
+  filter: blur(calc(var(--smokeBlur) * 1.12));
+}
+.ai-cert-smoke::after{
+  background:
+    conic-gradient(from calc(var(--smokeRot) * -1 + 90deg),
+      rgba(90,200,250,.30),
+      rgba(64,120,255,.24),
+      rgba(133,102,255,.34),
+      rgba(191,90,242,.26),
+      rgba(255,100,180,.26),
+      rgba(90,200,250,.30)
+    );
+}
+.ai-cert-shell::before{
+  background:
+    radial-gradient(circle at 2% 18%, rgba(90,200,250,.26), transparent 17%),
+    radial-gradient(circle at 98% 24%, rgba(133,102,255,.28), transparent 19%),
+    radial-gradient(circle at 96% 78%, rgba(191,90,242,.24), transparent 18%),
+    radial-gradient(circle at 4% 82%, rgba(64,120,255,.22), transparent 17%),
+    radial-gradient(circle at 50% 1%, rgba(120,190,255,.18), transparent 18%),
+    radial-gradient(circle at 50% 99%, rgba(255,100,180,.14), transparent 16%);
+}
+.ai-cert-shell::after{
+  background:
+    radial-gradient(circle at 0% 50%, rgba(64,120,255,.22), transparent 18%),
+    radial-gradient(circle at 100% 50%, rgba(191,90,242,.24), transparent 18%),
+    radial-gradient(circle at 28% 0%, rgba(90,200,250,.18), transparent 17%),
+    radial-gradient(circle at 72% 100%, rgba(255,100,180,.16), transparent 17%);
+}
+/* quiet living breath on top of the scroll-driven glow */
+@keyframes certBreath{
+  0%, 100%{ transform: scale(var(--smokeScale)); }
+  50%{ transform: scale(calc(var(--smokeScale) + .008)); }
+}
+.ai-cert-smoke{ animation: certBreath 9s ease-in-out infinite; }
+/* luminous hairline so the frame reads as a glass panel edge */
+.ai-cert-smoke::before{
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+}
+@media (prefers-reduced-motion: reduce){
+  .ai-cert-smoke{ animation: none; }
+}
+
+/* ---------------------------------------------------------
+   3. SYSTEMFLOW (#social-lottie .sf-v2) — 3D platform journey
+   --------------------------------------------------------- */
+
+#social-lottie.sf-v2{
+  position: relative;
+  min-height: 420vh;
+  background: #000;
+  overflow: clip;
+  padding: 0;
+}
+.sf-stage{
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  overflow: hidden;
+  padding: clamp(72px, 10vh, 110px) 24px clamp(28px, 4vh, 48px);
+}
+.sf-ambient{
+  --sf-glow-a: rgba(255,75,161,.34);
+  --sf-glow-b: rgba(255,138,74,.20);
+  position: absolute;
+  inset: -12%;
+  background:
+    radial-gradient(52% 42% at 50% 58%, var(--sf-glow-a), transparent 68%),
+    radial-gradient(38% 30% at 68% 34%, var(--sf-glow-b), transparent 70%),
+    radial-gradient(60% 50% at 32% 30%, rgba(123,97,255,.10), transparent 72%);
+  filter: blur(64px);
+  opacity: .5;
+  pointer-events: none;
+  transition: background .4s linear;
+}
+/* layered depth field: three faint light strata, no particles */
+.sf-field{ position: absolute; inset: 0; pointer-events: none; }
+.sf-field i{
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  width: min(880px, 92vw);
+  aspect-ratio: 2.6/1;
+  transform: translate(-50%,-50%);
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.045);
+  -webkit-mask: linear-gradient(180deg, transparent 8%, #000 45%, transparent 92%);
+          mask: linear-gradient(180deg, transparent 8%, #000 45%, transparent 92%);
+}
+.sf-field i:nth-child(2){ width: min(620px, 74vw); opacity: .8; }
+.sf-field i:nth-child(3){ width: min(1120px, 110vw); opacity: .5; }
+
+.sf-head{ text-align: center; max-width: 720px; z-index: 2; }
+.sf-head h2{
+  font-size: clamp(34px, 5vw, 72px);
+  letter-spacing: -.055em;
+  line-height: .96;
+  margin-top: 12px;
+}
+.sf-head p{
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255,255,255,.62);
+  max-width: 520px;
+  margin: 18px auto 0;
+}
+
+.sf-deck{
+  position: relative;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  perspective: 1100px;
+  width: 100%;
+}
+.sf-move{
+  grid-area: 1 / 1;
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
+}
+.sf-card{
+  position: relative;
+  width: min(360px, 84vw);
+  padding: 34px 34px 30px;
+  border-radius: 26px;
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  background: linear-gradient(165deg, rgba(255,255,255,.075), rgba(255,255,255,.02) 58%, rgba(255,255,255,.045));
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 40px 90px rgba(0,0,0,.6),
+    0 0 70px color-mix(in srgb, var(--c) 12%, transparent);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  transform-style: preserve-3d;
+  overflow: hidden;
+}
+.sf-card-sheen{
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 42%, rgba(255,255,255,.055) 50%, transparent 58%);
+  pointer-events: none;
+}
+.sf-card-icon{
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 12px;
+  border-radius: 20px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid color-mix(in srgb, var(--c) 32%, rgba(255,255,255,.10));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    0 0 26px color-mix(in srgb, var(--c) 22%, transparent);
+}
+.sf-card-icon img{ width: 40px; height: 40px; display: block; }
+.sf-card b{
+  font: 700 24px/1.1 'Syne', var(--font-body);
+  letter-spacing: -.02em;
+  color: #fff;
+}
+.sf-card-line{
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: .01em;
+  color: color-mix(in srgb, var(--c) 52%, rgba(255,255,255,.78));
+}
+
+.sf-progress{
+  display: flex;
+  gap: 10px;
+  z-index: 3;
+  padding-bottom: 6px;
+}
+.sf-dot{
+  width: 22px;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c) 75%, #fff);
+  opacity: .28;
+  transform: scale(.78);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--c) 40%, transparent);
+}
+
+@media (max-width: 899px){
+  /* base.css pins the old section at 500vh !important — must not apply
+     to the static mobile layout */
+  #social-lottie.sf-v2{ min-height: 0 !important; }
+  .sf-stage{
+    position: static;
+    height: auto;
+    grid-template-rows: none;
+    gap: 26px;
+    padding: 90px 20px 70px;
+  }
+  .sf-deck{
+    perspective: none;
+    grid-auto-flow: row;
+    gap: 16px;
+    justify-items: center;
+  }
+  .sf-move{ grid-area: auto; width: 100%; display: grid; justify-items: center; }
+  .sf-card{ width: min(420px, 100%); padding: 26px 24px 24px; }
+  .sf-ambient{ opacity: .35; filter: blur(48px); }
+  .sf-progress{ display: none; }
+}
+@media (prefers-reduced-motion: reduce){
+  .sf-card-sheen{ display: none; }
+}
+
+/* ---------------------------------------------------------
+   4. V66 HORIZONTAL SHOWCASE — deep black, designed not demo
+   --------------------------------------------------------- */
+
+#system-story-v64.system-story-v66{
+  background: #000;
+}
+#system-story-v64 .v66-panel{
+  background:
+    radial-gradient(46% 38% at 50% 40%, rgba(123,97,255,.07), transparent 70%),
+    radial-gradient(40% 34% at 72% 72%, rgba(0,255,231,.05), transparent 72%),
+    #000;
+}
+#system-story-v64 .v66-panel--final{
+  background:
+    radial-gradient(50% 42% at 50% 46%, rgba(0,255,231,.075), transparent 70%),
+    radial-gradient(36% 30% at 30% 70%, rgba(255,45,120,.05), transparent 72%),
+    #000;
+}
+#system-story-v64 .v66-sub{
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: rgba(255,255,255,.64);
+}
+#system-story-v64 .v66-chip{
+  border-color: rgba(255,255,255,.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+#system-story-v64 .v66-cardmini{
+  border-color: rgba(255,255,255,.11);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 30px 80px rgba(0,0,0,.5);
+}
+
+/* ---------------------------------------------------------
+   5. EXPERIENCE SLIDER — premium controls & card states
+   --------------------------------------------------------- */
+
+/* card surfaces: deeper glass, cleaner edge */
+.fb-slide{
+  border-color: rgba(255,255,255,.10) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    0 50px 130px rgba(0,0,0,.55) !important;
+}
+.fb-slide.is-next,
+.fb-slide.is-prev{
+  filter: saturate(.75) brightness(.8);
+}
+.fb-flow-head h3{
+  letter-spacing: -.03em;
+}
+.fb-flow-head p{
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: rgba(255,255,255,.66);
+}
+
+/* arrows: glass circles with inner light */
+.fb-arrow{
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 14px 34px rgba(0,0,0,.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: rgba(255,255,255,.9);
+}
+.fb-arrow:hover{
+  border-color: rgba(255,255,255,.28) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 14px 40px rgba(0,0,0,.5),
+    0 0 24px rgba(36,214,207,.18);
+}
+
+/* pagination: pill track feel */
+.fb-dots{
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+  align-items: center;
+}
+.fb-dot{
+  background: rgba(255,255,255,.28);
+}
+.fb-dot.is-active{
+  background: linear-gradient(90deg, #24d6cf, #7b61ff);
+  box-shadow: 0 0 16px rgba(36,214,207,.5);
+}
+
+/* ---------------------------------------------------------
+   6. AUTOMATION + NESTED OFFER CARDS — workflow card polish
+   --------------------------------------------------------- */
+
+.auto-card h3{ letter-spacing: -.045em; }
+.auto-index{ letter-spacing: .22em; opacity: .9; }
+.auto-tags span{
+  border-color: rgba(255,255,255,.12);
+  background: rgba(4,6,14,.55);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.nested-tabs button,
+.nested-tab{
+  transition: background .22s ease, border-color .22s ease, color .22s ease;
+}
+#portfolio-nested-offers article,
+#portfolio-nested-offers .nested-card{
+  border-color: rgba(255,255,255,.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 40px 110px rgba(0,0,0,.45);
+}
+#portfolio-nested-offers h3{ letter-spacing: -.035em; }
+#portfolio-nested-offers p{
+  font-family: var(--font-body);
+  line-height: 1.68;
+}
+
+/* ---------------------------------------------------------
+   7. GLOBAL — final surface consistency
+   --------------------------------------------------------- */
+
+.sep{ opacity: .8; }
+.section-kicker{ letter-spacing: .24em; }
