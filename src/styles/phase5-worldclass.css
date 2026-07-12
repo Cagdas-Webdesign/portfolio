@@ -1,0 +1,337 @@
+/* ============================================================
+   PHASE 5 — WORLD-CLASS PASS
+   1. Cert: true Apple-Intelligence inward bloom (not a line)
+   2. Kompetenz slider: Linear/Stripe-grade card system
+   3. SystemFlow v3: constellation scene
+   Loaded last; overrides earlier layers where they conflict.
+   ============================================================ */
+
+/* ---------------------------------------------------------
+   1. CERT — layered Apple Intelligence aura
+   Driven by block-07's scroll vars (--smokeAlpha, --smokeRot).
+   Layer stack (inside → out):
+     inner wash   : slow liquid conic, masked to edges only
+     inward bloom : big soft color diffusion INTO the panel
+     corner pools : four hue pools anchored in the corners
+     edge line    : thin luminous hairline
+     outer smoke  : (phase3 shell pseudos, kept, softened)
+   --------------------------------------------------------- */
+
+/* the smoke div itself becomes the inward bloom + corner pools */
+.ai-cert-smoke{
+  background:
+    /* corner pools */
+    radial-gradient(38% 30% at 0% 0%,     rgba(90,200,250,.30), transparent 70%),
+    radial-gradient(38% 30% at 100% 0%,   rgba(64,120,255,.28), transparent 70%),
+    radial-gradient(38% 30% at 100% 100%, rgba(191,90,242,.30), transparent 70%),
+    radial-gradient(38% 30% at 0% 100%,   rgba(255,100,180,.28), transparent 70%),
+    /* edge diffusion */
+    radial-gradient(70% 18% at 50% 0%,    rgba(120,190,255,.20), transparent 75%),
+    radial-gradient(70% 18% at 50% 100%,  rgba(133,102,255,.20), transparent 75%),
+    radial-gradient(16% 60% at 0% 50%,    rgba(90,200,250,.16), transparent 75%),
+    radial-gradient(16% 60% at 100% 50%,  rgba(255,100,180,.16), transparent 75%);
+  filter: blur(26px);
+  box-shadow:
+    inset 0 0 90px 10px rgba(101,140,255,.10),
+    inset 0 0 200px 40px rgba(133,102,255,.07);
+}
+
+/* inner liquid wash — rotating conic visible ONLY near the edges,
+   center stays pure black via inverted vignette mask */
+.ai-cert-smoke::after{
+  content: "";
+  inset: 0;
+  padding: 0;
+  background: conic-gradient(from var(--smokeRot),
+    rgba(90,200,250,.55), rgba(64,120,255,.45), rgba(133,102,255,.6),
+    rgba(191,90,242,.5), rgba(255,100,180,.5), rgba(120,190,255,.45),
+    rgba(90,200,250,.55));
+  -webkit-mask: radial-gradient(115% 115% at 50% 50%, transparent 58%, #000 92%);
+          mask: radial-gradient(115% 115% at 50% 50%, transparent 58%, #000 92%);
+  -webkit-mask-composite: source-over;
+  filter: blur(60px) saturate(1.15);
+  opacity: .75;
+}
+
+/* thin luminous edge — the only crisp element */
+.ai-cert-smoke::before{
+  content: "";
+  inset: -1px;
+  padding: 1.5px;
+  background: conic-gradient(from calc(var(--smokeRot) * 1.5),
+    rgba(120,210,255,.9), rgba(96,130,255,.7), rgba(160,120,255,.9),
+    rgba(220,120,230,.75), rgba(255,140,190,.8), rgba(120,210,255,.9));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  filter: blur(1.2px);
+  opacity: .9;
+  box-shadow: none;
+}
+
+/* soften the outer smoke from phase3 so the star is the inward bloom */
+.ai-cert-shell::before,
+.ai-cert-shell::after{
+  opacity: calc(var(--smokeAlpha) * .55);
+}
+
+/* Apple-clean title: quiet white with a soft iridescent sheen,
+   immune to the legacy --textHue rotation */
+.ai-cert-inner h2{
+  filter: none !important;
+}
+.ai-cert-inner h2 span{
+  color: rgba(255,255,255,.82);
+  -webkit-text-fill-color: rgba(255,255,255,.82);
+  background: none;
+}
+.ai-cert-inner h2 strong{
+  background: linear-gradient(100deg,
+    #cfe8ff 0%, #dcd2ff 30%, #f4c8f4 55%, #ffd3e2 78%, #cfe8ff 100%) !important;
+  background-size: 100% 100% !important;
+  -webkit-background-clip: text !important;
+          background-clip: text !important;
+  -webkit-text-fill-color: transparent;
+  color: transparent !important;
+  filter: none !important;
+  text-shadow: 0 0 46px rgba(160,140,255,.25) !important;
+}
+
+/* slightly slower, deeper breath */
+@keyframes certBreath{
+  0%, 100%{ transform: scale(var(--smokeScale)); opacity: var(--smokeAlpha); }
+  50%{ transform: scale(calc(var(--smokeScale) + .006)); opacity: calc(var(--smokeAlpha) * .86); }
+}
+.ai-cert-smoke{ animation: certBreath 11s ease-in-out infinite; }
+
+/* ---------------------------------------------------------
+   2. KOMPETENZ SLIDER — Linear/Stripe-grade card system
+   Same DOM & logic; a complete visual re-skin.
+   --------------------------------------------------------- */
+
+/* card: neutral deep glass, no green murk */
+.fb-slide{
+  background:
+    radial-gradient(90% 60% at 50% -10%, rgba(255,255,255,.05), transparent 60%),
+    linear-gradient(180deg, rgba(16,19,31,.86), rgba(7,9,16,.94)) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  border-top-color: rgba(255,255,255,.16) !important;
+  border-radius: 28px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 30px 80px rgba(0,0,0,.5),
+    0 2px 8px rgba(0,0,0,.4) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: filter .45s ease, opacity .45s ease;
+}
+.fb-slide.is-next,
+.fb-slide.is-prev{
+  filter: saturate(.55) brightness(.62);
+  opacity: .75;
+}
+
+/* typography: display title, quiet Inter body */
+.fb-flow-head h3{
+  font-family: 'Syne', var(--font-body);
+  font-size: clamp(22px, 2.3vw, 30px);
+  font-weight: 700;
+  letter-spacing: -.035em;
+  line-height: 1.08;
+  color: #fff;
+}
+.fb-flow-head p{
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.65;
+  letter-spacing: .002em;
+  color: rgba(255,255,255,.60);
+  max-width: 46ch;
+}
+
+/* the loose corner icon: contained, intentional */
+.fb-loose-icon{
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 10px 26px rgba(0,0,0,.35);
+}
+
+/* icon chain row: quiet container strip */
+.fb-flow-row{
+  background: rgba(255,255,255,.028);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 20px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+.fb-flow-row > i{
+  color: rgba(255,255,255,.30);
+  font-style: normal;
+}
+.fb-flow-tool small{
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  color: rgba(255,255,255,.66);
+}
+
+/* Fokus / Praxis notes: label chip + copy, aligned & calm */
+.fb-flow-notes > div{
+  background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015));
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+.fb-flow-notes b{
+  font: 600 10px/1 'JetBrains Mono', monospace;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.85);
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  padding: 7px 11px;
+}
+.fb-flow-notes span{
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: rgba(255,255,255,.62);
+}
+
+/* arrows: precise glass discs */
+.fb-arrow{
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 999px !important;
+  color: rgba(255,255,255,.92) !important;
+  transition: transform .2s cubic-bezier(.2,.7,.2,1), box-shadow .2s ease,
+              border-color .2s ease, background .2s ease;
+}
+.fb-arrow:hover{ transform: translateY(-1px); }
+.fb-arrow:active{ transform: scale(.92); }
+
+/* pagination: refined pill track (active gradient pill from phase3 kept) */
+.fb-dots{
+  gap: 8px;
+  padding: 8px 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  border-color: rgba(255,255,255,.10);
+}
+.fb-dot{ cursor: pointer; }
+.fb-dot.is-active{
+  box-shadow: 0 0 14px rgba(36,214,207,.45), inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+/* ---------------------------------------------------------
+   3. SYSTEMFLOW v3 — constellation scene
+   --------------------------------------------------------- */
+
+.sf3-caption{
+  position: relative;
+  height: 22px;
+  margin-top: 14px;
+}
+.sf3-caption span{
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  font: 500 11px/1 'JetBrains Mono', monospace;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+  white-space: nowrap;
+}
+
+.sf3-scene{
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.sf3-lines{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  opacity: .8;
+}
+.sf3-lines line{ filter: drop-shadow(0 0 6px currentColor); }
+
+.sf3-node{
+  position: absolute;
+  translate: -50% -50%;
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
+  z-index: 3;
+}
+.sf3-node-body{
+  display: grid;
+  justify-items: center;
+  gap: 9px;
+  padding: 16px 18px 13px;
+  border-radius: 20px;
+  background:
+    radial-gradient(80% 50% at 50% 0%, rgba(255,255,255,.07), transparent 65%),
+    linear-gradient(180deg, rgba(16,19,31,.78), rgba(7,9,16,.9));
+  border: 1px solid color-mix(in srgb, var(--c) 26%, rgba(255,255,255,.10));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    0 20px 50px rgba(0,0,0,.55),
+    0 0 34px color-mix(in srgb, var(--c) 14%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  cursor: default;
+}
+.sf3-node-icon{
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid color-mix(in srgb, var(--c) 30%, rgba(255,255,255,.08));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08),
+              0 0 18px color-mix(in srgb, var(--c) 20%, transparent);
+}
+.sf3-node-icon img{ width: 26px; height: 26px; object-fit: contain; }
+.sf3-node b{
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  color: rgba(255,255,255,.88);
+}
+
+/* head sits above the scene */
+.sf-head{ position: relative; z-index: 4; }
+/* core lives inside the scene now; its own styles come from phase4 */
+.sf3-scene .sf-core{ z-index: 2; }
+
+/* mobile: static 2-col grid, no scene positioning, no lines/core */
+@media (max-width: 899px){
+  .sf3-scene{
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    padding: 10px 4px 30px;
+    width: 100%;
+    max-width: 440px;
+    justify-self: center;
+  }
+  .sf3-lines, .sf3-scene .sf-core{ display: none; }
+  .sf3-node{
+    position: static;
+    translate: none;
+    width: 100%;
+    left: auto !important;
+    top: auto !important;
+  }
+  .sf3-node-body{ width: 100%; }
+  .sf3-caption{ display: none; }
+}
+@media (prefers-reduced-motion: reduce){
+  .ai-cert-smoke{ animation: none; }
+}
