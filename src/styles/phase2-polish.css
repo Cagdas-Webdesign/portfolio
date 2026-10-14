@@ -7,20 +7,18 @@
    ============================================================ */
 
 /* ---------- 1. Typographic system ----------
-   Display: Syne (unchanged — the site's identity)
-   Body:    Inter (now actually loaded; was silently falling
+   Display: var(--font-display) (unchanged — the site's identity)
+   Body:    var(--font-body) (now actually loaded; was silently falling
             back to system fonts in ~100 existing rules)
-   Mono:    JetBrains Mono — reserved for code, kickers,
+   Mono:    var(--font-mono) — reserved for code, kickers,
             stats and system labels */
 
-:root{
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
-}
+/* Die frühere lokale Schrift-Definition entfällt: die zentralen
+   Typografie-Tokens liegen in base.css (:root) und gelten global. */
 
-/* Long-form body copy: mono → Inter, readable size and rhythm.
+/* Long-form body copy: mono → var(--font-body), readable size and rhythm.
    Kickers, chips, stats and code keep their mono identity. */
 .exp-copy p,
-.reels-copy p,
 .auto-card p,
 .engine-card p,
 .engine-head p,
@@ -64,7 +62,7 @@ h1, h2, h3{
 
 /* ---------- 2. Glass surfaces / gray boxes ----------
    Consistent border brightness, a subtle top inner highlight
-   (the language .nav-cta already uses), and less muddy fills. */
+   (the same language the contact links use), and less muddy fills. */
 
 .step,
 .trust-list div{
@@ -111,17 +109,14 @@ h1, h2, h3{
 .fb-dot:not(.is-active):hover{ background: rgba(255,255,255,.65); }
 
 /* Slider arrows + reel nav: visible hover/press feedback */
-.fb-arrow,
-.reel-nav button{
+.fb-arrow{
   transition: background .22s ease, border-color .22s ease, transform .22s ease;
 }
-.fb-arrow:hover,
-.reel-nav button:hover{
+.fb-arrow:hover{
   background: rgba(255,255,255,.09);
   border-color: rgba(255,255,255,.22);
 }
-.fb-arrow:active,
-.reel-nav button:active{ transform: scale(.94); }
+.fb-arrow:active{ transform: scale(.94); }
 
 /* ---------- 4. Buttons & links ---------- */
 
@@ -133,10 +128,6 @@ h1, h2, h3{
   background: rgba(255,255,255,.09);
   border-color: rgba(255,255,255,.24);
   transform: translateY(-1px);
-}
-.nav-cta:hover{
-  background: rgba(255,255,255,.09);
-  border-color: rgba(255,255,255,.26);
 }
 
 /* ---------- 5. Accessibility polish ---------- */
@@ -153,8 +144,7 @@ a:focus-visible{
   .engine-card:hover,
   .contact-links a,
   .contact-links a:hover,
-  .fb-arrow:active,
-  .reel-nav button:active{
+  .fb-arrow:active{
     transition: none;
     transform: none;
   }

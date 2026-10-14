@@ -1,0 +1,109 @@
+/* ============================================================
+   FOOTER — tiefschwarz, schlicht, release-tauglich.
+   Unten rechts sitzt der Assistent, unten links Back-to-top: der
+   Abschluss bekommt deshalb genug Luft nach unten, damit beide nie
+   Inhalte des Footers verdecken.
+   ============================================================ */
+
+.site-footer {
+  position: relative;
+  background: #000000;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.site-footer__inner {
+  width: min(1320px, calc(100% - 64px));
+  margin: 0 auto;
+  padding: 56px 0 104px;
+}
+
+.site-footer__main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px 40px;
+}
+
+.site-footer__brand { min-width: 0; }
+
+.site-footer__name {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: var(--fw-display-strong);
+  font-size: 22px;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.site-footer__claim {
+  margin: 8px 0 0;
+  max-width: 46ch;
+  font-family: var(--font-body);
+  font-weight: var(--fw-body);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.site-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.site-footer__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.84);
+  font-family: var(--font-body);
+  font-weight: var(--fw-body-medium);
+  font-size: 13.5px;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease, background-color 0.25s ease;
+}
+
+.site-footer__link:hover,
+.site-footer__link:focus-visible {
+  border-color: rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+}
+
+.site-footer__link:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+.site-footer__copy {
+  margin: 40px 0 0;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font: 500 11px/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+@media (max-width: 700px) {
+  .site-footer__inner {
+    width: calc(100% - 40px);
+    padding: 44px 0 calc(96px + env(safe-area-inset-bottom));
+  }
+
+  .site-footer__main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-footer__name { font-size: 20px; }
+  .site-footer__copy { margin-top: 32px; }
+}

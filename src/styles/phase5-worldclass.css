@@ -1,108 +1,219 @@
 /* ============================================================
    PHASE 5 — WORLD-CLASS PASS
-   1. Cert: true Apple-Intelligence inward bloom (not a line)
+   1. Certificate: connected social network
    2. Kompetenz slider: Linear/Stripe-grade card system
    3. SystemFlow v3: constellation scene
    Loaded last; overrides earlier layers where they conflict.
    ============================================================ */
 
 /* ---------------------------------------------------------
-   1. CERT — layered Apple Intelligence aura
-   Driven by block-07's scroll vars (--smokeAlpha, --smokeRot).
-   Layer stack (inside → out):
-     inner wash   : slow liquid conic, masked to edges only
-     inward bloom : big soft color diffusion INTO the panel
-     corner pools : four hue pools anchored in the corners
-     edge line    : thin luminous hairline
-     outer smoke  : (phase3 shell pseudos, kept, softened)
+   1. CERTIFICATE — Basis-Typografie der Section
+   Der Scroll-Reveal (Website → Post → iPhone) liegt in
+   styles/social-reveal.css (Praefix .smr-).
    --------------------------------------------------------- */
 
-/* the smoke div itself becomes the inward bloom + corner pools */
-.ai-cert-smoke{
-  background:
-    /* corner pools */
-    radial-gradient(38% 30% at 0% 0%,     rgba(90,200,250,.30), transparent 70%),
-    radial-gradient(38% 30% at 100% 0%,   rgba(64,120,255,.28), transparent 70%),
-    radial-gradient(38% 30% at 100% 100%, rgba(191,90,242,.30), transparent 70%),
-    radial-gradient(38% 30% at 0% 100%,   rgba(255,100,180,.28), transparent 70%),
-    /* edge diffusion */
-    radial-gradient(70% 18% at 50% 0%,    rgba(120,190,255,.20), transparent 75%),
-    radial-gradient(70% 18% at 50% 100%,  rgba(133,102,255,.20), transparent 75%),
-    radial-gradient(16% 60% at 0% 50%,    rgba(90,200,250,.16), transparent 75%),
-    radial-gradient(16% 60% at 100% 50%,  rgba(255,100,180,.16), transparent 75%);
-  filter: blur(26px);
-  box-shadow:
-    inset 0 0 90px 10px rgba(101,140,255,.10),
-    inset 0 0 200px 40px rgba(133,102,255,.07);
-}
-
-/* inner liquid wash — rotating conic visible ONLY near the edges,
-   center stays pure black via inverted vignette mask */
-.ai-cert-smoke::after{
-  content: "";
-  inset: 0;
+#certified-social-media-manager.cert-network {
+  position: relative;
+  isolation: isolate;
+  contain: none;
+  width: 100%;
+  min-height: 380svh;
+  margin: 0;
   padding: 0;
-  background: conic-gradient(from var(--smokeRot),
-    rgba(90,200,250,.55), rgba(64,120,255,.45), rgba(133,102,255,.6),
-    rgba(191,90,242,.5), rgba(255,100,180,.5), rgba(120,190,255,.45),
-    rgba(90,200,250,.55));
-  -webkit-mask: radial-gradient(115% 115% at 50% 50%, transparent 58%, #000 92%);
-          mask: radial-gradient(115% 115% at 50% 50%, transparent 58%, #000 92%);
-  -webkit-mask-composite: source-over;
-  filter: blur(60px) saturate(1.15);
-  opacity: .75;
+  overflow: clip;
+  color: #f5f2ec;
+  background: #000;
 }
 
-/* thin luminous edge — the only crisp element */
-.ai-cert-smoke::before{
-  content: "";
-  inset: -1px;
-  padding: 1.5px;
-  background: conic-gradient(from calc(var(--smokeRot) * 1.5),
-    rgba(120,210,255,.9), rgba(96,130,255,.7), rgba(160,120,255,.9),
-    rgba(220,120,230,.75), rgba(255,140,190,.8), rgba(120,210,255,.9));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  filter: blur(1.2px);
-  opacity: .9;
-  box-shadow: none;
+.cert-network__stage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  padding: clamp(74px, 9vh, 106px) clamp(28px, 5vw, 84px) clamp(32px, 4.5vh, 54px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #000;
 }
 
-/* soften the outer smoke from phase3 so the star is the inward bloom */
-.ai-cert-shell::before,
-.ai-cert-shell::after{
-  opacity: calc(var(--smokeAlpha) * .55);
+.cert-network__intro {
+  position: relative;
+  z-index: 4;
+  width: min(1120px, 92vw);
+  text-align: center;
+  will-change: transform, opacity;
 }
 
-/* Apple-clean title: quiet white with a soft iridescent sheen,
-   immune to the legacy --textHue rotation */
-.ai-cert-inner h2{
-  filter: none !important;
+.cert-network__intro h2 {
+  margin: 0;
+  color: #f4f1eb;
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 760;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
+  
+  overflow: hidden;
+  padding-bottom: clamp(12px, 1.9vw, 30px);
+  margin-bottom: calc(-1 * clamp(12px, 1.9vw, 30px));
 }
-.ai-cert-inner h2 span{
-  color: rgba(255,255,255,.82);
-  -webkit-text-fill-color: rgba(255,255,255,.82);
+
+.cert-network__subline .cert-word {
+  display: inline-block;
+  will-change: transform;
+}
+
+.cert-network__intro h2 span,
+.cert-network__intro h2 strong {
+  display: block;
+  color: inherit;
+  font: inherit;
   background: none;
-}
-.ai-cert-inner h2 strong{
-  background: linear-gradient(100deg,
-    #cfe8ff 0%, #dcd2ff 30%, #f4c8f4 55%, #ffd3e2 78%, #cfe8ff 100%) !important;
-  background-size: 100% 100% !important;
-  -webkit-background-clip: text !important;
-          background-clip: text !important;
-  -webkit-text-fill-color: transparent;
-  color: transparent !important;
-  filter: none !important;
-  text-shadow: 0 0 46px rgba(160,140,255,.25) !important;
+  -webkit-text-fill-color: currentColor;
+  text-shadow: none;
 }
 
-/* slightly slower, deeper breath */
-@keyframes certBreath{
-  0%, 100%{ transform: scale(var(--smokeScale)); opacity: var(--smokeAlpha); }
-  50%{ transform: scale(calc(var(--smokeScale) + .006)); opacity: calc(var(--smokeAlpha) * .86); }
+.cert-network__intro h2 span {
+  font-size: clamp(42px, 5.3vw, 82px);
+  line-height: 1;
+  font-weight: 620;
+  color: rgba(244, 241, 235, 0.74);
 }
-.ai-cert-smoke{ animation: certBreath 11s ease-in-out infinite; }
+
+.cert-network__intro h2 strong {
+  margin-top: 0.08em;
+  font-size: clamp(62px, 8.8vw, 142px);
+  line-height: 0.91;
+}
+
+.cert-network__subline {
+  max-width: 640px;
+  margin: clamp(24px, 3.5vh, 38px) auto 0;
+  color: rgba(224, 226, 231, 0.55);
+  font: 450 clamp(13px, 1.15vw, 16px)/1.72 var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.008em;
+}
+
+.cert-network__iconrow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(11px, 1.2vw, 15px);
+  width: min(680px, 90vw);
+  margin: clamp(22px, 3.2vh, 34px) auto 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cert-network__iconrow li {
+  position: relative;
+  width: clamp(40px, 3.4vw, 46px);
+  height: clamp(40px, 3.4vw, 46px);
+  display: grid;
+  place-items: center;
+  background: #050608;
+  border: 1px solid color-mix(in srgb, var(--cert-accent) 28%, rgba(255, 255, 255, 0.09));
+  border-radius: 13px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 16px color-mix(in srgb, var(--cert-accent) 7%, transparent),
+    0 10px 24px rgba(0, 0, 0, 0.32);
+  transition:
+    transform 220ms cubic-bezier(0.22, 0.8, 0.24, 1),
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.cert-network__iconrow li::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.085), transparent 44%);
+  pointer-events: none;
+}
+
+.cert-network__iconrow li:hover {
+  border-color: color-mix(in srgb, var(--cert-accent) 52%, rgba(255, 255, 255, 0.13));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 20px color-mix(in srgb, var(--cert-accent) 13%, transparent),
+    0 14px 30px rgba(0, 0, 0, 0.36);
+}
+
+.cert-network__iconrow img {
+  width: clamp(20px, 1.7vw, 23px);
+  height: clamp(20px, 1.7vw, 23px);
+  display: block;
+  object-fit: contain;
+}
+
+
+
+@media (max-width: 700px) {
+  #certified-social-media-manager.cert-network {
+    min-height: 250svh;
+  }
+
+  .cert-network__stage {
+    padding: 72px 12px 22px;
+  }
+
+  .cert-network__intro {
+    width: calc(100vw - 36px);
+  }
+
+  .cert-network__intro h2 {
+    letter-spacing: -0.048em;
+  }
+
+  .cert-network__intro h2 span {
+    font-size: clamp(34px, 10.5vw, 45px);
+  }
+
+  .cert-network__intro h2 strong {
+    max-width: 11ch;
+    margin: 0.12em auto 0;
+    font-size: clamp(43px, 13.6vw, 58px);
+    line-height: 0.94;
+  }
+
+  .cert-network__subline {
+    max-width: 32ch;
+    margin-top: 21px;
+    font-size: 12px;
+    line-height: 1.58;
+  }
+
+  .cert-network__iconrow {
+    gap: 9px;
+    margin-top: 19px;
+  }
+
+  .cert-network__iconrow li {
+    width: 37px;
+    height: 37px;
+    border-radius: 11px;
+  }
+
+  .cert-network__iconrow img {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+
+
+@media (max-width: 360px), (max-height: 650px) and (max-width: 700px) {
+  .cert-network__stage {
+    padding-top: 58px;
+  }
+}
+
+
+
+/* Reduzierte Bewegung: siehe social-reveal.css (.smr--static) */
 
 /* ---------------------------------------------------------
    2. KOMPETENZ SLIDER — Linear/Stripe-grade card system
@@ -131,9 +242,9 @@
   opacity: .75;
 }
 
-/* typography: display title, quiet Inter body */
+/* typography: display title, quiet var(--font-body) body */
 .fb-flow-head h3{
-  font-family: 'Syne', var(--font-body);
+  font-family: var(--font-display), var(--font-body);
   font-size: clamp(22px, 2.3vw, 30px);
   font-weight: 700;
   letter-spacing: -.035em;
@@ -184,7 +295,7 @@
   box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
 }
 .fb-flow-notes b{
-  font: 600 10px/1 'JetBrains Mono', monospace;
+  font: 600 10px/1 var(--font-mono), monospace;
   letter-spacing: .14em;
   text-transform: uppercase;
   color: rgba(255,255,255,.85);
@@ -225,113 +336,192 @@
 }
 
 /* ---------------------------------------------------------
-   3. SYSTEMFLOW v3 — constellation scene
+   4. AUTOMATION CARDS — editorial premium restyle
+   Inhalte, Sticky-Verhalten und der Scale-ScrollTrigger aus
+   den Legacy-Skripten bleiben unverändert.
    --------------------------------------------------------- */
 
-.sf3-caption{
-  position: relative;
-  height: 22px;
-  margin-top: 14px;
-}
-.sf3-caption span{
-  position: absolute;
-  left: 50%;
-  translate: -50% 0;
-  font: 500 11px/1 'JetBrains Mono', monospace;
-  letter-spacing: .26em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.55);
-  white-space: nowrap;
+.auto-cards{
+  margin-top: 6vh;
 }
 
-.sf3-scene{
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-}
-.sf3-lines{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  opacity: .8;
-}
-.sf3-lines line{ filter: drop-shadow(0 0 6px currentColor); }
-
-.sf3-node{
-  position: absolute;
-  translate: -50% -50%;
-  transform-style: preserve-3d;
-  will-change: transform, opacity, filter;
-  z-index: 3;
-}
-.sf3-node-body{
-  display: grid;
-  justify-items: center;
-  gap: 9px;
-  padding: 16px 18px 13px;
-  border-radius: 20px;
+.auto-card{
   background:
-    radial-gradient(80% 50% at 50% 0%, rgba(255,255,255,.07), transparent 65%),
-    linear-gradient(180deg, rgba(16,19,31,.78), rgba(7,9,16,.9));
-  border: 1px solid color-mix(in srgb, var(--c) 26%, rgba(255,255,255,.10));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.09),
-    0 20px 50px rgba(0,0,0,.55),
-    0 0 34px color-mix(in srgb, var(--c) 14%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  cursor: default;
-}
-.sf3-node-icon{
-  width: 46px;
-  height: 46px;
-  display: grid;
-  place-items: center;
-  border-radius: 14px;
-  background: rgba(255,255,255,.05);
-  border: 1px solid color-mix(in srgb, var(--c) 30%, rgba(255,255,255,.08));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.08),
-              0 0 18px color-mix(in srgb, var(--c) 20%, transparent);
-}
-.sf3-node-icon img{ width: 26px; height: 26px; object-fit: contain; }
-.sf3-node b{
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .01em;
-  color: rgba(255,255,255,.88);
+    linear-gradient(180deg, rgba(255,255,255,.028), rgba(255,255,255,0) 32%),
+    linear-gradient(180deg, #0a0b0d 0%, #050506 58%, #020203 100%) !important;
+  border: 1px solid rgba(255,255,255,.08);
+  border-top-color: rgba(255,255,255,.14);
+  border-radius: 30px;
+  box-shadow: 0 46px 120px rgba(0,0,0,.6);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 48px 50px 44px;
+  gap: 48px;
 }
 
-/* head sits above the scene */
-.sf-head{ position: relative; z-index: 4; }
-/* core lives inside the scene now; its own styles come from phase4 */
-.sf3-scene .sf-core{ z-index: 2; }
-
-/* mobile: static 2-col grid, no scene positioning, no lines/core */
-@media (max-width: 899px){
-  .sf3-scene{
-    position: static;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-    padding: 10px 4px 30px;
-    width: 100%;
-    max-width: 440px;
-    justify-self: center;
-  }
-  .sf3-lines, .sf3-scene .sf-core{ display: none; }
-  .sf3-node{
-    position: static;
-    translate: none;
-    width: 100%;
-    left: auto !important;
-    top: auto !important;
-  }
-  .sf3-node-body{ width: 100%; }
-  .sf3-caption{ display: none; }
+.auto-card::before{
+  inset: 0;
+  background: radial-gradient(110% 70% at 14% -8%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 52%);
+  filter: none;
+  opacity: 1;
 }
-@media (prefers-reduced-motion: reduce){
-  .ai-cert-smoke{ animation: none; }
+
+.auto-index{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  font: 640 10px/1 var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent) 58%, rgba(255,255,255,.6));
+}
+
+.auto-index::before{
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+.auto-card h3{
+  font-family: var(--font-display), var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(30px, 3.4vw, 50px);
+  font-weight: 700;
+  line-height: .96;
+  letter-spacing: -.05em;
+  color: #fff;
+}
+
+.auto-card p{
+  max-width: 42ch;
+  color: rgba(255,255,255,.66);
+  font-size: 14.5px;
+  line-height: 1.72;
+  letter-spacing: -.008em;
+}
+
+.auto-tags{
+  gap: 8px;
+  margin-top: 26px;
+}
+
+.auto-tags span{
+  font: 640 9.5px/1 var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.68);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.02);
+  box-shadow: none;
+}
+
+.auto-card:hover .auto-tags span{
+  border-color: color-mix(in srgb, var(--accent) 24%, rgba(255,255,255,.1));
+}
+
+/* ---------- Drei Karten: Text links, Lottie rechts, pechschwarz ---------- */
+
+.auto-card{
+  grid-template-columns: 1.05fr .95fr;
+  align-items: center;
+  gap: clamp(36px, 4vw, 60px);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.022), rgba(255,255,255,0) 30%),
+    linear-gradient(180deg, #080808 0%, #030303 55%, #000000 100%) !important;
+}
+
+.auto-card::before{
+  background: none;
+}
+
+.auto-card__copy{
+  min-width: 0;
+}
+
+.auto-card__copy h3{
+  margin-bottom: 20px;
+}
+
+.auto-card__copy p{
+  max-width: 46ch;
+  color: rgba(255,255,255,.68);
+}
+
+.auto-card__lottie{
+  position: relative;
+  width: min(100%, 400px);
+  margin-inline: auto;
+  min-width: 0;
+}
+
+/* kontrollierter Glow ausschließlich um die Lottie */
+.auto-card__lottie::before{
+  content: "";
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 10%, transparent), transparent 68%);
+  filter: blur(26px);
+  pointer-events: none;
+}
+
+.auto-card__lottie svg{
+  position: relative;
+  display: block;
+}
+
+/* korrekte Seitenverhaeltnisse der drei Dateien */
+.auto-card:nth-child(1) .auto-card__lottie{ aspect-ratio: 1242 / 831; }
+.auto-card:nth-child(2) .auto-card__lottie{ aspect-ratio: 1600 / 1000; }
+.auto-card:nth-child(3) .auto-card__lottie{ aspect-ratio: 1 / 1; max-width: 290px; }
+
+@media (max-width: 900px){
+  .auto-card{
+    grid-template-columns: 1fr;
+    padding: 28px 22px 30px;
+    gap: 18px;
+    border-radius: 24px;
+  }
+
+  /* Mobile-Reihenfolge: Lottie oben, Text darunter */
+  .auto-card__lottie{
+    order: -1;
+    width: min(72vw, 260px);
+  }
+
+  .auto-card:nth-child(3) .auto-card__lottie{
+    width: min(52vw, 190px);
+  }
+
+  .auto-card__lottie::before{
+    filter: blur(18px);
+  }
+
+  .auto-card h3{
+    margin-bottom: 14px;
+    font-size: clamp(27px, 7.4vw, 36px);
+  }
+
+  .auto-card p{
+    font-size: 13.5px;
+    line-height: 1.64;
+  }
+}
+
+/* Footer steht jetzt eigenständig am Seitenende (Contact-Section entfernt) */
+.footerline{
+  margin-bottom: 46px;
+}
+
+/* Automation ist jetzt die letzte Section: kein 90vh-Leerlauf mehr vor dem
+   Footer. Sticky-Stack und Scale-Trigger funktionieren unverändert. */
+#automation{
+  min-height: 0;
+}
+
+.auto-cards{
+  padding-bottom: 18vh;
 }

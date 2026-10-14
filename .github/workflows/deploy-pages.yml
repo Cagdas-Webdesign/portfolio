@@ -1,0 +1,74 @@
+# Baut das Portfolio und veroeffentlicht dist/ auf GitHub Pages.
+#
+# Start nur manuell (Actions → „Deploy to GitHub Pages“ → Run workflow),
+# damit ein Push nie ungewollt live geht.
+#
+# Benoetigte Repository-VARIABLES (Settings → Secrets and variables →
+# Actions → Variables) — beide sind oeffentlich und landen ohnehin im
+# Browser-Bundle, deshalb Variables statt Secrets:
+#   VITE_RAG_API_URL         Cloudflare-Worker-Endpoint …/api/v1/chat
+#   VITE_TURNSTILE_SITE_KEY  oeffentlicher Turnstile-Site-Key
+# Echte Secrets (Turnstile-Secret, Provider-Keys) liegen nur im Worker bzw.
+# in Cloud Run und gehoeren NIE hierher.
+
+name: Deploy to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Check public build variables
+        env:
+          VITE_RAG_API_URL: ${{ vars.VITE_RAG_API_URL }}
+          VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
+        # Nur pruefen, ob gesetzt — Werte werden nicht ausgegeben.
+        run: |
+          missing=0
+          [ -n "$VITE_RAG_API_URL" ] || { echo "::error::Repository variable VITE_RAG_API_URL fehlt"; missing=1; }
+          [ -n "$VITE_TURNSTILE_SITE_KEY" ] || { echo "::error::Repository variable VITE_TURNSTILE_SITE_KEY fehlt"; missing=1; }
+          exit $missing
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+
+      - name: Build
+        env:
+          VITE_RAG_API_URL: ${{ vars.VITE_RAG_API_URL }}
+          VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,615 @@
+/* =============================================================================
+   Shell — Header, Settings-Sheet, Hero.
+   Eigenes Stylesheet statt eines weiteren Patch-Blocks: die drei Bereiche
+   wurden neu gebaut, ihre alten Regeln sind aus base.css/patches.css entfernt.
+   Alle Selektoren hier sind neu und kollidieren nicht mit Legacy-Klassen,
+   deshalb kommt diese Datei ohne ein einziges !important aus.
+   Typografie ausschliesslich ueber die Tokens aus base.css :root.
+   ========================================================================== */
+
+:root {
+  --shell-head-h: 74px;
+  --shell-edge: clamp(20px, 4vw, 58px);
+  --shell-line: rgba(255, 255, 255, 0.1);
+  --shell-surface: rgba(9, 12, 24, 0.72);
+  --shell-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =============================================================================
+   A) Header
+   ========================================================================== */
+
+nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: var(--shell-head-h);
+  padding: 0 var(--shell-edge);
+  padding-left: max(var(--shell-edge), env(safe-area-inset-left));
+  padding-right: max(var(--shell-edge), env(safe-area-inset-right));
+}
+
+/* Der Balken selbst traegt keine Flaeche. Erst beim Scrollen legt sich eine
+   Schicht darunter — im Hero bleibt der Header dadurch schwerelos. */
+nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(2, 3, 10, 0.86), rgba(2, 3, 10, 0.42) 62%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid transparent;
+  opacity: 0;
+  transition: opacity 0.4s var(--shell-ease), border-color 0.4s var(--shell-ease);
+  pointer-events: none;
+}
+
+nav.is-lifted::before {
+  opacity: 1;
+  border-bottom-color: var(--shell-line);
+}
+
+.shell-logo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: var(--fw-display-strong);
+  font-size: 21px;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  text-decoration: none;
+  transition: color 0.25s var(--shell-ease);
+}
+
+.shell-menu {
+  /* Kompakter Button: pechschwarz, weisse Schrift — Materialsprache wie
+     Assistent und Back-to-top (feiner heller Rand, weicher Schatten). */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  padding: 0 13px 0 15px;
+  border: 1px solid rgba(235, 240, 244, 0.18);
+  border-radius: 13px;
+  background: #000000;
+  color: #ffffff;
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  font-family: var(--font-body);
+  font-weight: var(--fw-body-strong);
+  font-size: 13px;
+  letter-spacing: 0.005em;
+  line-height: 1;
+  transition: border-color 0.28s var(--shell-ease), box-shadow 0.28s var(--shell-ease),
+    transform 0.28s var(--shell-ease);
+}
+
+.shell-menu:hover,
+.shell-menu:focus-visible,
+.shell-menu[aria-expanded="true"] {
+  border-color: rgba(246, 249, 251, 0.4);
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+.shell-menu:active {
+  transform: scale(0.97);
+}
+
+.shell-menu__glyph {
+  display: block;
+  width: 17px;
+  height: 17px;
+  transition: transform 0.4s var(--shell-ease);
+}
+
+.shell-menu[aria-expanded="true"] .shell-menu__glyph {
+  transform: rotate(90deg);
+}
+
+.shell-logo:focus-visible,
+.shell-menu:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+@media (max-width: 560px) {
+  :root {
+    --shell-head-h: 64px;
+  }
+
+  .shell-logo {
+    font-size: 19px;
+  }
+
+  .shell-menu {
+    padding: 0 12px 0 14px;
+    font-size: 12.5px;
+  }
+}
+
+/* =============================================================================
+   B) Settings-Sheet
+   ========================================================================== */
+
+.shell-sheet-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 40001;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Eine Wahrheitsquelle: solange die Seite gesperrt ist, faengt die Ebene
+   Eingaben ab. Sobald der State geschlossen ist, ist die noch ausfahrende
+   Ebene rein optisch und darf nichts mehr blockieren. */
+html.shell-sheet-open .shell-sheet-layer {
+  pointer-events: auto;
+}
+
+/* Waehrend der Ausfahrt ist die Ebene nur noch Optik. */
+html.shell-sheet-open .shell-sheet-layer.is-closing {
+  pointer-events: none;
+}
+
+.shell-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  /* Wischen auf dem Overlay scrollt nicht die gesperrte Seite (iOS) */
+  touch-action: none;
+  background: rgba(2, 3, 10, 0.66);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.shell-sheet {
+  position: relative;
+  width: min(600px, 100%);
+  max-height: min(84vh, 720px);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(170, 190, 225, 0.12);
+  border-bottom: 0;
+  border-radius: 26px 26px 0 0;
+  /* Ink Navy: fast schwarz mit leichtem Blauanteil, ruhig statt dominant */
+  background:
+    radial-gradient(90% 40% at 50% 0%, rgba(120, 150, 220, 0.045), transparent 70%),
+    linear-gradient(180deg, #0a0d16, #06080e);
+  box-shadow: 0 -30px 90px rgba(0, 0, 0, 0.6);
+  padding: 10px 0 max(22px, env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+
+.shell-sheet__grip {
+  flex: none;
+  width: 42px;
+  height: 4px;
+  margin: 4px auto 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.shell-sheet__head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 24px 18px;
+}
+
+.shell-sheet__title {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display);
+  font-size: 19px;
+  letter-spacing: var(--ls-display);
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.shell-sheet__note {
+  margin-top: 5px;
+  font-family: var(--font-body);
+  font-weight: var(--fw-body);
+  font-size: 13px;
+  line-height: var(--lh-body);
+  color: var(--muted);
+}
+
+.shell-sheet__close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -6px -8px 0 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.25s var(--shell-ease), background 0.25s var(--shell-ease),
+    border-color 0.25s var(--shell-ease);
+}
+
+.shell-sheet__close:hover,
+.shell-sheet__close:focus-visible {
+  border-color: var(--shell-line);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.shell-sheet__close svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Eigener Scrollbereich, damit das Sheet auf kleinen Geraeten nie
+   ueber den Viewport hinauslaeuft. */
+.shell-sheet__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 24px 4px;
+}
+
+.shell-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 700px) {
+  .shell-sheet-layer {
+    align-items: center;
+  }
+
+  .shell-sheet {
+    max-height: min(78vh, 680px);
+    border-bottom: 1px solid rgba(170, 190, 225, 0.12);
+    border-radius: 26px;
+    padding-bottom: 22px;
+  }
+
+  .shell-sheet__grip {
+    display: none;
+  }
+
+  .shell-sheet__head {
+    padding-top: 12px;
+  }
+}
+
+/* =============================================================================
+   C) Hero
+   Ruhezustand = Endzustand. Die Headline tippt sich per React ein (Hero.jsx);
+   GSAP blendet nur Buttons und Scroll-Hinweis ein.
+   ========================================================================== */
+
+/* Bewusst ohne z-index: die koerperweite Icon-Bruecke liegt auf z-index 2.
+   Bekaeme #hero einen eigenen Stacking-Kontext, waeren Headline und Buttons
+   darin gefangen und die Icons wuerden davor liegen. So staffelt es sich
+   sauber: Schleier 0, Bruecke 2, Glasflaeche 3, Inhalt 4. */
+/* Der fruehere Scroll-Hinweis belegte unten eine eigene Grid-Zeile (77px).
+   Sein Platz steckt jetzt im unteren Innenabstand — so bleibt die Headline
+   exakt dort, wo sie vorher stand. */
+#hero {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr;
+  place-items: center;
+  min-height: 100svh;
+  padding: calc(var(--shell-head-h) + clamp(28px, 6vh, 72px)) var(--shell-edge)
+    calc(clamp(72px, 12vh, 120px) + 77px);
+  overflow: clip;
+}
+
+/* Ruhiger Lichtschleier statt Orbs, Raster und Code-Tapete.
+   Traegt die Tiefe, ohne mit der Typografie zu konkurrieren. */
+.hx-veil {
+  position: absolute;
+  inset: -12% -6%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(46% 40% at 50% 42%, rgba(74, 163, 255, 0.13), transparent 70%),
+    radial-gradient(36% 34% at 66% 62%, rgba(123, 97, 255, 0.11), transparent 72%),
+    radial-gradient(30% 26% at 32% 60%, rgba(0, 255, 231, 0.07), transparent 74%);
+}
+
+.hx-inner {
+  /* Bewusst ohne z-index: sonst waere die Glasflaeche (::before) im Stapel des
+     Inhalts gefangen. So liegt sie zwischen den schwebenden Tech-Icons (2) und
+     der Schrift (4); Headline und Buttons tragen die Ebene 4 selbst. */
+  --hx-surface-x: clamp(28px, 5vw, 68px);
+  --hx-surface-y: clamp(26px, 4.4vh, 46px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(34px, 5vh, 54px);
+  width: min(1080px, 100%);
+  text-align: center;
+}
+
+/* Dezente Glasflaeche hinter Headline und Buttons: bettet die Schrift ein,
+   ohne Card-Charakter. Absolut positioniert — veraendert kein Layout.
+   Ebene 3: Tech-Icons, die hinter die Mitte treiben, liegen unter dem Glas
+   und bleiben so ausserhalb der Flaeche; die Schrift steht darueber ruhig. */
+.hx-inner::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--hx-surface-y)) calc(-1 * var(--hx-surface-x));
+  z-index: 3;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  border-radius: clamp(28px, 3.4vw, 44px);
+  /* Pechschwarz fuer maximalen Kontrast (Nutzerwunsch 2026-10-07). */
+  background: #000000;
+  box-shadow:
+    0 24px 72px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  backdrop-filter: blur(14px) saturate(1.1);
+  pointer-events: none;
+}
+
+.hx-title,
+.hx-actions {
+  position: relative;
+  z-index: 4;
+}
+
+/* Ab Tablet umschliesst die Flaeche nur den Inhalt, nicht die volle Breite. */
+@media (min-width: 701px) {
+  .hx-inner {
+    width: fit-content;
+    max-width: 100%;
+  }
+}
+
+.hx-title {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display-strong);
+  font-size: clamp(54px, 12vw, 116px);
+  letter-spacing: -0.046em;
+  /* Drei Zeilen als eine Einheit: enger gesetzt als der Standard-Durchschuss. */
+  line-height: 0.9;
+  color: var(--text);
+}
+
+.hx-type {
+  display: block;
+}
+
+/* Vollstaendige Headline fuer Screenreader; die getippte Ebene ist aria-hidden. */
+.hx-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hx-line {
+  display: block;
+  white-space: nowrap;
+}
+
+/* Platzhalter + Live-Text liegen deckungsgleich: die Zeile hat von Anfang an
+   ihre endgueltige Breite und Hoehe, beim Tippen verschiebt sich nichts. */
+.hx-type__word {
+  position: relative;
+  display: inline-block;
+}
+
+.hx-type__ghost {
+  visibility: hidden;
+}
+
+.hx-type__live {
+  position: absolute;
+  inset: 0;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Hierarchie: Full-Stack hell, Web leiser, Developer mit dezentem Marken-Verlauf. */
+.hx-line--primary {
+  color: var(--text);
+}
+
+.hx-line--soft {
+  color: rgba(244, 246, 255, 0.44);
+  font-weight: var(--fw-display);
+}
+
+.hx-line--accent .hx-type__live {
+  background: linear-gradient(100deg, #f4f6ff 6%, #c2e8ff 46%, #b3a6ff 94%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Schmaler Cursor. Waehrend des Tippens ruhig, danach kurz nachblinken und
+   ausblenden — die fertige Headline steht ohne Stoerelement. */
+.hx-caret {
+  display: inline-block;
+  width: 0.055em;
+  height: 0.8em;
+  margin-left: 0.07em;
+  border-radius: 1px;
+  background: rgba(194, 232, 255, 0.92);
+  vertical-align: baseline;
+}
+
+.hx-caret.is-fading {
+  animation: hxCaretOut 1.9s steps(1, end) forwards, hxCaretFade 1.9s ease forwards;
+}
+
+@keyframes hxCaretOut {
+  0%, 40%, 80% { visibility: visible; }
+  20%, 60% { visibility: hidden; }
+  100% { visibility: hidden; }
+}
+
+@keyframes hxCaretFade {
+  0%, 80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.hx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.hx-btn {
+  display: inline-flex;
+  text-decoration: none;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 0 32px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-weight: var(--fw-body-strong);
+  font-size: 15.5px;
+  letter-spacing: -0.005em;
+  line-height: 1;
+  transition: background 0.28s var(--shell-ease), border-color 0.28s var(--shell-ease),
+    color 0.28s var(--shell-ease), transform 0.28s var(--shell-ease),
+    box-shadow 0.28s var(--shell-ease);
+}
+
+.hx-btn svg {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.32s var(--shell-ease);
+}
+
+/* Fuehrendes Icon (GitHub, E-Mail): gleiche Groesse in beiden Buttons, volle
+   Deckkraft in Textfarbe; der Innenabstand links wird optisch ausgeglichen. */
+.hx-btn .hx-btn__icon {
+  width: 19px;
+  height: 19px;
+  margin-left: -4px;
+  margin-right: 1px;
+  opacity: 1;
+}
+
+/* Der Brief ist eine Linienzeichnung: minimal kraeftiger, damit er neben der
+   gefuellten GitHub-Mark gleich stark wirkt. */
+.hx-btn--ghost .hx-btn__icon {
+  stroke-width: 1.9;
+}
+
+/* Genau ein primaerer Call-to-Action im Hero. */
+.hx-btn--primary {
+  background: var(--text);
+  color: #04060f;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.45);
+}
+
+.hx-btn--primary:hover,
+.hx-btn--primary:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.52), 0 0 0 1px rgba(0, 255, 231, 0.24);
+}
+
+.hx-btn--primary:hover .hx-btn__arrow,
+.hx-btn--primary:focus-visible .hx-btn__arrow {
+  transform: translateX(3px);
+}
+
+.hx-btn--ghost {
+  border-color: var(--shell-line);
+  background: rgba(255, 255, 255, 0.035);
+  color: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.hx-btn--ghost:hover,
+.hx-btn--ghost:focus-visible {
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.hx-btn:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.hx-btn:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+  .hx-inner {
+    --hx-surface-x: 12px;
+    --hx-surface-y: 22px;
+  }
+
+  .hx-title {
+    letter-spacing: -0.038em;
+  }
+
+  .hx-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .hx-btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-caret {
+    display: none;
+  }
+
+  .hx-btn,
+  .hx-btn svg {
+    transition-duration: 0.01ms;
+  }
+
+  .hx-btn:hover,
+  .hx-btn:focus-visible,
+  .hx-btn:active {
+    transform: none;
+  }
+}

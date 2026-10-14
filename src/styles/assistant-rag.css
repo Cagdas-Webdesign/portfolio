@@ -1,0 +1,409 @@
+/* RAG-Anbindung des Floating-Assistenten: Scrollbereich, Quellen, Retry und
+   Turnstile. Alles unter #aiAssistantWidget und mit eigenen Klassen — das
+   bestehende Chat-Design (Farben, Typografie, Bubbles) bleibt unberuehrt. */
+
+/* ---------- Scrollbereich: Nachrichten scrollen, alles darunter ist fest ---------- */
+
+#aiAssistantWidget .ai-chat-body {
+  min-height: 0;
+}
+
+#aiAssistantWidget .ai-chat-messages {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-block: 12px;
+}
+
+/* Slider und Composer werden nie gestaucht und ueberlagern keine Nachrichten. */
+#aiAssistantWidget .ai-prompt-slider,
+#aiAssistantWidget .ai-chat-form {
+  flex-shrink: 0;
+}
+
+/* Lange Woerter und URLs brechen innerhalb der Bubble um. */
+#aiAssistantWidget .ai-chat-message {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Quellen: runde Chips unter der Antwort ---------- */
+
+#aiAssistantWidget .ai-chat-sources {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  white-space: normal;
+}
+
+#aiAssistantWidget .ai-chat-sources-label {
+  margin-right: 3px;
+  color: var(--assistant-label);
+  font: 650 10px/1 var(--font-body), system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#aiAssistantWidget .ai-chat-source-chip {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: var(--assistant-source-inactive-text);
+  background: var(--assistant-source-inactive);
+  border: 1px solid var(--assistant-source-inactive-border);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 0 var(--assistant-source-highlight);
+  font: 600 10.5px/1 var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+#aiAssistantWidget .ai-chat-source-chip:hover {
+  color: var(--assistant-source-hover-text);
+  background: var(--assistant-source-hover);
+  border-color: var(--assistant-source-hover-border);
+  transform: translateY(-1px);
+}
+
+#aiAssistantWidget .ai-chat-source-chip:focus-visible,
+#aiAssistantWidget .ai-chat-source-popover-close:focus-visible,
+#aiAssistantWidget .ai-chat-source-popover-link:focus-visible {
+  outline: 2px solid var(--assistant-source-focus);
+  outline-offset: 2px;
+}
+
+/* Eigene Lichtkante: die helle Kante der inaktiven Chips lag sonst als weisse
+   Sichel im dunklen aktiven Kreis (Arctic White). */
+#aiAssistantWidget .ai-chat-source-chip.is-active {
+  color: var(--assistant-source-active-text);
+  background: var(--assistant-source-active);
+  border-color: var(--assistant-source-active);
+  box-shadow: inset 0 1px 0 var(--assistant-source-active-highlight);
+}
+
+/* ---------- Quellen-Popover: im Nachrichtenbereich, per JS positioniert ---------- */
+
+#aiAssistantWidget .ai-chat-source-popover {
+  position: absolute;
+  z-index: 40;
+  box-sizing: border-box;
+  width: min(300px, calc(100% - 16px));
+  padding: 11px 13px 13px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--assistant-popover-text);
+  background: var(--assistant-popover-bg);
+  border: 1px solid var(--assistant-popover-border);
+  border-radius: var(--assistant-radius-popover);
+  box-shadow:
+    0 18px 48px var(--assistant-popover-shadow),
+    inset 0 1px 0 var(--assistant-popover-highlight);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  animation: aiSourcePopoverIn 160ms ease-out;
+}
+
+#aiAssistantWidget .ai-chat-source-popover[data-placement='above'] {
+  animation-name: aiSourcePopoverInAbove;
+}
+
+#aiAssistantWidget .ai-chat-source-popover.is-constrained {
+  scrollbar-width: thin;
+  scrollbar-color: var(--assistant-scrollbar) transparent;
+}
+
+@keyframes aiSourcePopoverIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes aiSourcePopoverInAbove {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #aiAssistantWidget .ai-chat-source-popover { animation: none; }
+  #aiAssistantWidget .ai-chat-source-chip:hover { transform: none; }
+}
+
+#aiAssistantWidget .ai-chat-source-popover-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+/* Gleiche Form und Zahl wie der aktive Source-Chip. */
+#aiAssistantWidget .ai-chat-source-popover-badge {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--assistant-source-active-text);
+  background: var(--assistant-source-active);
+  border-radius: 50%;
+  font: 600 10.5px/1 var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+#aiAssistantWidget .ai-chat-source-popover-context {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--assistant-label);
+  font: 650 10px/1 var(--font-body), system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#aiAssistantWidget .ai-chat-source-popover-close {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: var(--assistant-popover-close);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+#aiAssistantWidget .ai-chat-source-popover-close:hover {
+  color: var(--assistant-source-hover-text);
+  background: var(--assistant-popover-close-hover-bg);
+  border-color: var(--assistant-popover-border);
+}
+
+#aiAssistantWidget .ai-chat-source-popover-close svg {
+  width: 14px;
+  height: 14px;
+}
+
+#aiAssistantWidget .ai-chat-source-popover-title {
+  margin: 0;
+  color: var(--assistant-popover-title);
+  font: 700 13.5px/1.35 var(--font-body), system-ui, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+#aiAssistantWidget .ai-chat-source-popover-section {
+  margin: 4px 0 0;
+  color: var(--assistant-popover-muted);
+  font: 500 11.5px/1.4 var(--font-body), system-ui, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+#aiAssistantWidget .ai-chat-source-popover-link {
+  display: block;
+  margin-top: 9px;
+  color: var(--assistant-popover-link);
+  font: 500 11px/1.4 var(--font-mono), monospace;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+#aiAssistantWidget .ai-chat-source-popover-link:hover {
+  color: var(--assistant-source-hover-text);
+  text-decoration: underline;
+}
+
+/* ---------- Fehlermeldung: manueller Retry ---------- */
+
+#aiAssistantWidget .ai-chat-retry {
+  display: block;
+  margin-top: 9px;
+  padding: 7px 11px;
+  color: var(--assistant-prompt-text);
+  background: var(--assistant-prompt-bg);
+  border: 1px solid var(--assistant-control-border);
+  border-radius: 999px;
+  font: 600 11px/1 var(--font-body), system-ui, sans-serif;
+  cursor: pointer;
+}
+
+#aiAssistantWidget .ai-chat-retry:hover:not(:disabled) {
+  color: var(--assistant-source-hover-text);
+  border-color: var(--assistant-source-hover-border);
+}
+
+#aiAssistantWidget .ai-chat-retry:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ---------- Turnstile (Invisible): nie sichtbar, belegt keinen Platz ---------- */
+
+#aiAssistantWidget .ai-chat-turnstile {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- Header: Vollbild-Button neben dem Schliessen-Button ---------- */
+
+#aiAssistantWidget .ai-chat-header-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Masse, Form und Farben wie .ai-chat-close (patches.css / assistant-redesign.css).
+   Der Design-Button teilt dieselbe Header-Control-Optik. */
+#aiAssistantWidget .ai-chat-fullscreen,
+#aiAssistantWidget .ai-chat-theme-button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--assistant-control-text);
+  background: var(--assistant-control-bg);
+  border: 1px solid var(--assistant-control-border);
+  border-radius: var(--assistant-radius-control);
+  cursor: pointer;
+  transition: var(--assistant-interaction-transition);
+}
+
+/* Neutral im Ruhezustand, Blau nur bei Interaktion (Focus-Ring: assistant-redesign.css). */
+#aiAssistantWidget .ai-chat-fullscreen:hover,
+#aiAssistantWidget .ai-chat-theme-button:hover,
+#aiAssistantWidget .ai-chat-theme-button[aria-expanded='true'] {
+  color: var(--assistant-control-hover-text);
+  background: var(--assistant-control-hover-bg);
+  border-color: var(--assistant-accent-border);
+  box-shadow: 0 0 12px -2px var(--assistant-accent-glow);
+}
+
+#aiAssistantWidget .ai-chat-fullscreen svg,
+#aiAssistantWidget .ai-chat-theme-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 420px) {
+  #aiAssistantWidget .ai-chat-fullscreen,
+  #aiAssistantWidget .ai-chat-theme-button {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* ---------- Vollbild (Geometrie setzt useAssistantFullscreen) ---------- */
+
+#aiAssistantWidget .ai-chat-panel.is-fullscreen {
+  --ai-fs-inset: 20px;
+  --ai-fs-radius: 30px;
+  position: fixed !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  z-index: 2;
+}
+
+@media (max-width: 920px) {
+  #aiAssistantWidget .ai-chat-panel.is-fullscreen {
+    --ai-fs-inset: 16px;
+    --ai-fs-radius: 26px;
+  }
+}
+
+@media (max-width: 640px) {
+  #aiAssistantWidget .ai-chat-panel.is-fullscreen {
+    --ai-fs-inset: 0px;
+    --ai-fs-radius: 0px;
+    border-width: 0 !important;
+  }
+
+  #aiAssistantWidget[data-fullscreen='true'] .ai-chat-header {
+    padding-top: max(15px, env(safe-area-inset-top)) !important;
+  }
+
+  #aiAssistantWidget[data-fullscreen='true'] .ai-chat-form {
+    padding-bottom: max(14px, env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* Desktop-Vollbild: zentrierte Conversation-Spalte INNERHALB des breiten Panels.
+   Nachrichtenbereich, Slider und Composer bleiben volle Breite (Scrollbalken am
+   Panelrand, Scroll-Logik unveraendert) und bekommen nur seitliches Padding.
+   max() mit dem bisherigen Wert: bei schmalem Panel greift der alte Abstand,
+   dadurch waechst die Spalte waehrend der Expand-/Collapse-Animation stufenlos
+   mit. Header, Aussenabstand, Radius und Animation bleiben unberuehrt. */
+@media (min-width: 921px) {
+  #aiAssistantWidget .ai-chat-panel.is-fullscreen .ai-chat-messages {
+    padding-inline: max(16px, calc((100% - 960px) / 2)) !important;
+  }
+
+  #aiAssistantWidget .ai-chat-panel.is-fullscreen .ai-chat-form {
+    padding-inline: max(14px, calc((100% - 960px) / 2)) !important;
+  }
+
+  /* Prompt-Karten schmaler als die Spalte. Hier ueber die Breite statt ueber
+     Padding: overflow:hidden schneidet an der Padding-Kante, breites Padding
+     liesse die Nachbarseite des Sliders sichtbar werden. 752px = 720px Karten
+     + bestehende 16px Innenabstand je Seite. Slide-Logik bleibt unberuehrt. */
+  #aiAssistantWidget .ai-chat-panel.is-fullscreen .ai-prompt-slider {
+    align-self: center;
+    box-sizing: border-box;
+    width: min(100%, 752px);
+  }
+
+  /* Angenehme Lesebreite; im angedockten Widget greifen weiter die 88 %. */
+  #aiAssistantWidget .ai-chat-panel.is-fullscreen .ai-chat-message.bot {
+    max-width: min(88%, 720px) !important;
+  }
+
+  #aiAssistantWidget .ai-chat-panel.is-fullscreen .ai-chat-message.user {
+    max-width: min(88%, 520px) !important;
+  }
+}
+
+/* Website dahinter dezent abdunkeln; blendet mit dem Chat zusammen aus. */
+#aiAssistantWidget .ai-chat-fs-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.42);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 500ms cubic-bezier(0.32, 0.72, 0, 1), visibility 0s linear 500ms;
+}
+
+#aiAssistantWidget.is-open[data-fullscreen='true'] .ai-chat-fs-backdrop {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 500ms cubic-bezier(0.32, 0.72, 0, 1), visibility 0s;
+}
+
+/* Der schwebende Roboter-Button liegt sonst ueber dem Vollbild-Composer. */
+#aiAssistantWidget[data-fullscreen='true'] .ai-chat-toggle {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #aiAssistantWidget .ai-chat-fs-backdrop { transition: none; }
+}

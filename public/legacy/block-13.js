@@ -17,17 +17,17 @@
         ScrollTrigger.sort();
         ScrollTrigger.refresh(true);
         ScrollTrigger.update();
-      }catch(e){}
+      }catch{}
     }
 
     /* Browser/Live-Server-Mobile-Preview braucht manchmal ein Layout-Signal */
     try{
       window.dispatchEvent(new Event('resize'));
-    }catch(e){}
+    }catch{}
 
     try{
       document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
-    }catch(e){}
+    }catch{}
   }
 
   function scheduleRefreshes(){

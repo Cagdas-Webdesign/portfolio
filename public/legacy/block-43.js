@@ -4,13 +4,6 @@
   if(window.__v60HeroPlatformFix) return;
   window.__v60HeroPlatformFix = true;
 
-  function removeHeroDiamond(){
-    document.querySelectorAll('#heroType .hero-star').forEach(function(el){
-      if(window.gsap){ window.gsap.killTweensOf(el); }
-      el.remove();
-    });
-  }
-
   function waitPlatform(cb){
     if(window.gsap && window.ScrollTrigger) cb();
     else setTimeout(function(){ waitPlatform(cb); }, 80);
@@ -176,12 +169,11 @@
   }
 
   function boot(){
-    removeHeroDiamond();
     waitPlatform(initPlatformFlowV60);
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, {once:true});
   else boot();
-  window.addEventListener('load', function(){ removeHeroDiamond(); waitPlatform(initPlatformFlowV60); }, {once:true});
+  window.addEventListener('load', function(){ waitPlatform(initPlatformFlowV60); }, {once:true});
   window.addEventListener('resize', function(){
     clearTimeout(window.__v60Resize);
     window.__v60Resize = setTimeout(function(){ if(window.ScrollTrigger) window.ScrollTrigger.refresh(); }, 180);

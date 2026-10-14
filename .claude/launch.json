@@ -5,6 +5,7 @@
       "name": "portfolio-dev",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
+      "cwd": "/Users/cagdasucar/Downloads/Portfolio Çağdaş 1/portfolio-react",
       "port": 5173
     }
   ]

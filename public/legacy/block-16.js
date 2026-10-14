@@ -19,7 +19,7 @@
         onComplete: function(){ el.textContent = target + suffix; }
       });
     } else {
-      var start = 0, startTs = null, dur = 1150;
+      var startTs = null, dur = 1150;
       function frame(ts){
         if(!startTs) startTs = ts;
         var p = Math.min((ts - startTs)/dur, 1);

@@ -1,0 +1,645 @@
+/* ============================================================
+   AI ASSISTANT / SPLINE ROBOT
+   Canonical styles for the split assistant portal, Spline stage and
+   static floating launcher. The functional chat DOM stays intact.
+   ============================================================ */
+
+.spline-robot,
+.spline-robot *,
+.robot-head-fallback,
+.robot-head-fallback * {
+  box-sizing: border-box;
+}
+
+/* Old demo-card and moving background layers are deliberately disabled. */
+
+/* ---------- Portal and real-size Spline stage ---------- */
+
+.spline-robot {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: transparent;
+  filter: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+.spline-robot__scene {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0;
+  background: transparent !important;
+  filter: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+  transition: opacity 320ms ease;
+}
+
+.spline-robot__scene canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  opacity: 1 !important;
+  background: transparent !important;
+  filter: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+  touch-action: pan-y;
+}
+
+.spline-robot.is-loaded .spline-robot__scene {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .spline-robot.is-interactive,
+  .spline-robot.is-interactive .spline-robot__scene,
+  .spline-robot.is-interactive .spline-robot__scene canvas {
+    pointer-events: auto !important;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .spline-robot,
+  .spline-robot__scene,
+  .spline-robot__scene canvas {
+    pointer-events: none !important;
+    touch-action: pan-y !important;
+  }
+}
+
+/* ---------- Left-hand assistant copy ---------- */
+
+/* ---------- Static fallback while Spline initializes ---------- */
+
+.robot-head-fallback {
+  --robot-width: min(44%, 350px);
+  --robot-center-y: 49%;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.robot-head-fallback__aura {
+  position: absolute;
+  left: 50%;
+  top: var(--robot-center-y);
+  width: calc(var(--robot-width) * 1.58);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(113, 184, 214, 0.1), transparent 68%);
+  transform: translate(-50%, -50%);
+}
+
+.robot-head-fallback__shell {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: var(--robot-center-y);
+  width: var(--robot-width);
+  aspect-ratio: 1.05 / 0.9;
+  overflow: hidden;
+  background: linear-gradient(145deg, #dce5e9 0%, #8998a0 47%, #384148 100%);
+  border: 1px solid rgba(229, 240, 245, 0.58);
+  border-radius: 38% 38% 34% 34% / 34% 34% 43% 43%;
+  box-shadow:
+    0 28px 66px rgba(0, 0, 0, 0.5),
+    inset 0 2px 2px rgba(255, 255, 255, 0.46),
+    inset 0 -12px 24px rgba(4, 9, 13, 0.35);
+  transform: translate(-50%, -50%);
+}
+
+.robot-head-fallback__brow {
+  position: absolute;
+  top: 8%;
+  left: 23%;
+  width: 54%;
+  height: 2.5%;
+  border-radius: 99px;
+  background: rgba(245, 251, 253, 0.62);
+}
+
+.robot-head-fallback__face {
+  position: absolute;
+  top: 25%;
+  right: 10%;
+  bottom: 17%;
+  left: 10%;
+  overflow: hidden;
+  background: #020609;
+  border: 1px solid rgba(161, 215, 230, 0.28);
+  border-radius: 31% 31% 38% 38% / 30% 30% 42% 42%;
+  box-shadow: inset 0 0 32px rgba(93, 174, 201, 0.07), 0 2px 0 rgba(255, 255, 255, 0.25);
+}
+
+.robot-head-fallback__eye {
+  position: absolute;
+  top: 39%;
+  width: 18%;
+  height: 10%;
+  border-radius: 99px;
+  background: #a8e8f0;
+  box-shadow: 0 0 12px rgba(168, 232, 240, 0.66), 0 0 24px rgba(116, 193, 211, 0.24);
+}
+
+.robot-head-fallback__eye--left { left: 22%; }
+.robot-head-fallback__eye--right { right: 22%; }
+
+.robot-head-fallback__mouth {
+  position: absolute;
+  left: 41%;
+  bottom: 23%;
+  width: 18%;
+  height: 2px;
+  border-radius: 99px;
+  background: rgba(168, 232, 240, 0.58);
+}
+
+.robot-head-fallback__chin {
+  position: absolute;
+  right: 34%;
+  bottom: 5%;
+  left: 34%;
+  height: 4%;
+  border-radius: 99px;
+  background: rgba(8, 16, 21, 0.55);
+}
+
+.robot-head-fallback__antenna {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: calc(var(--robot-center-y) - var(--robot-width) * 0.58);
+  width: 2px;
+  height: calc(var(--robot-width) * 0.15);
+  background: #8998a0;
+  transform: translateX(-50%);
+}
+
+.robot-head-fallback__antenna-tip {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: calc(var(--robot-width) * 0.06);
+  min-width: 5px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #b1edf3;
+  box-shadow: 0 0 12px rgba(177, 237, 243, 0.52);
+  transform: translate(-50%, -50%);
+}
+
+.robot-head-fallback__ear {
+  position: absolute;
+  z-index: 2;
+  top: var(--robot-center-y);
+  width: calc(var(--robot-width) * 0.13);
+  height: calc(var(--robot-width) * 0.31);
+  background: #57656d;
+  border: 1px solid rgba(216, 234, 240, 0.34);
+  border-radius: 45%;
+  transform: translateY(-50%);
+}
+
+.robot-head-fallback__ear--left { left: calc(50% - var(--robot-width) * 0.57); }
+.robot-head-fallback__ear--right { right: calc(50% - var(--robot-width) * 0.57); }
+
+.robot-head-fallback[data-state="loading"] .robot-head-fallback__eye,
+.spline-robot[data-state="loading"] .robot-head-fallback__eye {
+  animation: assistant-robot-loading 1.35s ease-in-out infinite alternate;
+}
+
+.robot-head-fallback[data-state="error"] .robot-head-fallback__eye,
+.spline-robot[data-state="error"] .robot-head-fallback__eye {
+  background: #e0b5a4;
+  box-shadow: 0 0 12px rgba(224, 181, 164, 0.42);
+}
+
+@keyframes assistant-robot-loading {
+  to {
+    opacity: 0.48;
+    transform: scaleX(0.72);
+  }
+}
+
+/* ---------- Open chat: surface palette ---------- */
+/* Alle Farben und Radien kommen aus den Theme-Tokens in assistant-themes.css
+   (Standard: Neural Blue). Hier stehen nur noch die Zuordnungen. */
+
+#aiAssistantWidget .ai-chat-panel {
+  color: var(--assistant-text) !important;
+  background: var(--assistant-bg) !important;
+  border-color: var(--assistant-panel-border) !important;
+  box-shadow:
+    0 40px 130px var(--assistant-shadow),
+    inset 0 1px 0 var(--assistant-panel-highlight) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+#aiAssistantWidget .ai-chat-panel::before {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+
+#aiAssistantWidget .ai-chat-header {
+  background: var(--assistant-header-bg) !important;
+  border-bottom-color: var(--assistant-divider) !important;
+}
+
+#aiAssistantWidget .ai-chat-body {
+  background: var(--assistant-bg) !important;
+}
+
+/* Ueber dem (optionalen) Theme-Wallpaper der .ai-chat-body. */
+#aiAssistantWidget .ai-chat-messages,
+#aiAssistantWidget .ai-prompt-slider {
+  background: var(--assistant-chat-surface) !important;
+}
+
+#aiAssistantWidget .ai-chat-brand b {
+  color: var(--assistant-text) !important;
+}
+
+#aiAssistantWidget .ai-chat-brand span {
+  color: var(--assistant-text-muted) !important;
+}
+
+#aiAssistantWidget .ai-chat-brand span i {
+  background: var(--assistant-status-dot) !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+/* Schliessen: neutral; Hover/Focus themeunabhaengig rot (assistant-themes.css). */
+#aiAssistantWidget .ai-chat-close {
+  color: var(--assistant-control-text) !important;
+  background: var(--assistant-control-bg) !important;
+  border-color: var(--assistant-control-border) !important;
+  border-radius: var(--assistant-radius-control) !important;
+  box-shadow: none !important;
+  transition: var(--assistant-interaction-transition) !important;
+}
+
+#aiAssistantWidget .ai-chat-close span {
+  background: var(--assistant-close-icon) !important;
+  box-shadow: 0 0 12px var(--assistant-close-icon-glow) !important;
+}
+
+#aiAssistantWidget .ai-chat-close:hover,
+#aiAssistantWidget .ai-chat-close:focus-visible {
+  color: var(--assistant-danger) !important;
+  background: var(--assistant-danger-bg) !important;
+  border-color: var(--assistant-danger-border) !important;
+  box-shadow: 0 0 14px -2px var(--assistant-danger-glow) !important;
+}
+
+#aiAssistantWidget .ai-chat-close:hover span,
+#aiAssistantWidget .ai-chat-close:focus-visible span {
+  background: var(--assistant-danger) !important;
+  box-shadow: none !important;
+}
+
+#aiAssistantWidget .ai-chat-close:focus-visible {
+  outline: 2px solid var(--assistant-danger-border) !important;
+  outline-offset: 2px !important;
+}
+
+#aiAssistantWidget .ai-chat-message {
+  border-radius: var(--assistant-radius-message) !important;
+}
+
+#aiAssistantWidget .ai-chat-message.bot,
+#aiAssistantWidget .ai-chat-message.user {
+  color: var(--assistant-text-assistant) !important;
+  background: var(--assistant-surface-assistant) !important;
+  border-color: var(--assistant-border-assistant) !important;
+  box-shadow:
+    0 1px 2px var(--assistant-bubble-drop),
+    inset 0 1px 0 var(--assistant-bubble-highlight) !important;
+}
+
+#aiAssistantWidget .ai-chat-message.bot {
+  border-top-left-radius: var(--assistant-radius-assistant-tail-top) !important;
+  border-bottom-left-radius: var(--assistant-radius-assistant-tail) !important;
+}
+
+#aiAssistantWidget .ai-chat-message.user {
+  color: var(--assistant-text-user) !important;
+  background:
+    linear-gradient(180deg, var(--assistant-user-tint-top), var(--assistant-user-tint-bottom)),
+    var(--assistant-surface-user) !important;
+  border-color: var(--assistant-border-user) !important;
+  border-top-right-radius: var(--assistant-radius-user-tail-top) !important;
+  border-bottom-right-radius: var(--assistant-radius-user-tail) !important;
+  box-shadow:
+    0 1px 2px var(--assistant-bubble-drop),
+    inset 0 1px 0 var(--assistant-user-highlight) !important;
+}
+
+#aiAssistantWidget .ai-chat-message.loading i {
+  background: var(--assistant-loading-dot) !important;
+  box-shadow: none !important;
+}
+
+#aiAssistantWidget .ai-prompt-pull,
+#aiAssistantWidget .ai-prompt-arrow {
+  color: var(--assistant-nav-text) !important;
+  background: var(--assistant-nav-bg) !important;
+  border-color: var(--assistant-control-border) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transition: var(--assistant-interaction-transition) !important;
+}
+
+#aiAssistantWidget .ai-prompt-pull:hover,
+#aiAssistantWidget .ai-prompt-arrow:hover {
+  color: var(--assistant-control-hover-text) !important;
+  background: var(--assistant-nav-hover-bg) !important;
+  border-color: var(--assistant-accent-border) !important;
+  box-shadow: 0 0 12px -2px var(--assistant-accent-glow) !important;
+  filter: none !important;
+}
+
+#aiAssistantWidget .ai-prompt-page .ai-chat-suggestion {
+  color: var(--assistant-prompt-text) !important;
+  background: var(--assistant-prompt-bg) !important;
+  border-color: var(--assistant-prompt-border) !important;
+  border-radius: var(--assistant-radius-prompt) !important;
+  box-shadow:
+    0 1px 2px var(--assistant-prompt-drop),
+    inset 0 1px 0 var(--assistant-prompt-highlight) !important;
+  transition: var(--assistant-interaction-transition) !important;
+}
+
+#aiAssistantWidget .ai-prompt-page .ai-chat-suggestion:hover {
+  color: var(--assistant-prompt-hover-text) !important;
+  background: var(--assistant-prompt-hover-bg) !important;
+  border-color: var(--assistant-accent-border) !important;
+  box-shadow:
+    0 0 16px -6px var(--assistant-accent-glow),
+    inset 0 1px 0 var(--assistant-prompt-hover-highlight) !important;
+}
+
+#aiAssistantWidget .ai-prompt-page .ai-chat-suggestion:focus-visible,
+#aiAssistantWidget .ai-prompt-arrow:focus-visible,
+#aiAssistantWidget .ai-prompt-dot:focus-visible,
+#aiAssistantWidget .ai-prompt-pull:focus-visible,
+#aiAssistantWidget .ai-chat-form button:focus-visible,
+#aiAssistantWidget .ai-chat-fullscreen:focus-visible,
+#aiAssistantWidget .ai-chat-theme-button:focus-visible {
+  outline: 2px solid var(--assistant-accent) !important;
+  outline-offset: 2px !important;
+}
+
+#aiAssistantWidget .ai-prompt-dot {
+  background: var(--assistant-pagination-inactive) !important;
+  box-shadow: none !important;
+}
+
+#aiAssistantWidget .ai-prompt-dot:hover {
+  background: var(--assistant-pagination-hover) !important;
+}
+
+#aiAssistantWidget .ai-prompt-dot.is-active {
+  background: var(--assistant-pagination-active) !important;
+  box-shadow: none !important;
+}
+
+#aiAssistantWidget .ai-chat-form {
+  background: var(--assistant-composer-bg) !important;
+  border-top-color: var(--assistant-divider) !important;
+}
+
+/* Composer: Accent-Kontur im Widget UND im Vollbild — nicht erst beim Fokus. */
+#aiAssistantWidget .ai-chat-form input {
+  color: var(--assistant-input-text) !important;
+  background: var(--assistant-input-bg) !important;
+  border-color: var(--assistant-input-border) !important;
+  border-radius: var(--assistant-radius-input) !important;
+  box-shadow: none !important;
+  transition: var(--assistant-interaction-transition) !important;
+}
+
+#aiAssistantWidget .ai-chat-form input::placeholder {
+  color: var(--assistant-input-placeholder) !important;
+}
+
+#aiAssistantWidget .ai-chat-form input:focus {
+  background: var(--assistant-input-focus-bg) !important;
+  border-color: var(--assistant-input-focus-border) !important;
+  box-shadow:
+    0 0 0 3px var(--assistant-accent-soft),
+    0 0 18px -6px var(--assistant-accent-glow) !important;
+}
+
+#aiAssistantWidget .ai-chat-form button {
+  color: var(--assistant-send-text) !important;
+  background: var(--assistant-send-bg) !important;
+  border-color: var(--assistant-send-border) !important;
+  border-radius: var(--assistant-radius-send) !important;
+  box-shadow:
+    0 12px 28px var(--assistant-send-drop),
+    inset 0 1px 0 var(--assistant-send-highlight) !important;
+  filter: none !important;
+  text-shadow: none !important;
+  transition: var(--assistant-interaction-transition) !important;
+}
+
+#aiAssistantWidget .ai-chat-form button::before {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+
+#aiAssistantWidget .ai-chat-form button:hover {
+  color: var(--assistant-send-hover-text) !important;
+  background: var(--assistant-send-hover-bg) !important;
+  border-color: var(--assistant-accent-hover) !important;
+  box-shadow:
+    0 14px 32px var(--assistant-send-hover-drop),
+    0 0 20px var(--assistant-accent-glow),
+    inset 0 1px 0 var(--assistant-send-hover-highlight) !important;
+  filter: none !important;
+}
+
+#aiAssistantWidget .ai-chat-form button svg,
+#aiAssistantWidget .ai-prompt-arrow svg {
+  color: inherit !important;
+  filter: none !important;
+}
+
+#aiAssistantWidget .ai-chat-messages {
+  scrollbar-color: var(--assistant-scrollbar) var(--assistant-bg);
+}
+
+/* ---------- Floating assistant: one static 320px PNG, no WebGL ---------- */
+
+#aiAssistantWidget.ai-assistant-widget {
+  transition: opacity 240ms ease, visibility 240ms ease;
+}
+
+#aiAssistantWidget .ai-chat-toggle {
+  position: relative !important;
+  width: 72px !important;
+  height: 72px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  display: grid !important;
+  place-items: center !important;
+  color: #fff !important;
+  background: #020305 !important;
+  border: 1px solid rgba(235, 240, 244, 0.2) !important;
+  border-radius: 22px !important;
+  outline: 0 !important;
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.52),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  cursor: pointer !important;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 240ms ease,
+    visibility 240ms ease,
+    transform 220ms cubic-bezier(0.22, 0.8, 0.24, 1),
+    border-color 220ms ease,
+    box-shadow 220ms ease !important;
+  -webkit-backdrop-filter: none !important;
+  -webkit-filter: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+#aiAssistantWidget .ai-chat-toggle::before,
+#aiAssistantWidget .ai-chat-toggle::after {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+#aiAssistantWidget .ai-chat-toggle-image {
+  position: absolute !important;
+  z-index: 2 !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: cover !important;
+  object-position: 50% 50% !important;
+  opacity: 1 !important;
+  background: #020305 !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+  -webkit-filter: none !important;
+  -webkit-transform: none !important;
+}
+
+#aiAssistantWidget .ai-chat-toggle:hover {
+  border-color: rgba(246, 249, 251, 0.42) !important;
+  box-shadow:
+    0 22px 54px rgba(0, 0, 0, 0.58),
+    0 0 0 1px rgba(255, 255, 255, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09) !important;
+  transform: translate3d(0, -3px, 0);
+}
+
+#aiAssistantWidget .ai-chat-toggle:active {
+  transform: translate3d(0, 0, 0) scale(0.97);
+}
+
+#aiAssistantWidget .ai-chat-toggle:focus-visible {
+  outline: 1px solid rgba(245, 248, 250, 0.78) !important;
+  outline-offset: 4px !important;
+}
+
+#aiAssistantWidget.assistant-widget--section-visible:not(.is-open) .ai-chat-toggle,
+#aiAssistantWidget.assistant-widget--yield:not(.is-open) .ai-chat-toggle {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none !important;
+  transform: translate3d(0, 12px, 0) scale(0.9);
+}
+
+#aiAssistantWidget.is-open .ai-chat-toggle {
+  visibility: visible;
+  opacity: 1;
+}
+
+#aiAssistantWidget .ai-chat-orb {
+  position: relative !important;
+  width: 48px !important;
+  height: 48px !important;
+  overflow: hidden !important;
+  background: #020305 !important;
+  border: 1px solid rgba(235, 240, 244, 0.15) !important;
+  border-radius: 14px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+}
+
+#aiAssistantWidget .ai-chat-orb > img {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  opacity: 1 !important;
+  background: #020305 !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  -webkit-filter: none !important;
+}
+
+/* ---------- Responsive split layout ---------- */
+
+@media (max-width: 600px) {
+
+  .spline-robot__scene canvas {
+    transform: translate3d(0, -30%, 0) !important;
+  }
+
+  .robot-head-fallback {
+    --robot-width: min(60%, 270px);
+  }
+
+  #aiAssistantWidget.ai-assistant-widget {
+    right: max(13px, env(safe-area-inset-right));
+    bottom: max(13px, env(safe-area-inset-bottom));
+  }
+
+  #aiAssistantWidget .ai-chat-toggle {
+    width: 62px !important;
+    height: 62px !important;
+    border-radius: 19px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #aiAssistantWidget *,
+  #aiAssistantWidget *::before,
+  #aiAssistantWidget *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

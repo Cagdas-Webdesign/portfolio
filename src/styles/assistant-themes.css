@@ -1,0 +1,1007 @@
+/* Theme-/Design-System des AI Portfolio Assistant.
+
+   Eine Komponente, eine Logik — Themes sind ausschliesslich Tokens.
+   Das Widget traegt data-assistant-theme="neural-blue | cosmic-green |
+   metallic-red | arctic-white"; assistant-redesign.css und assistant-rag.css
+   lesen nur diese Tokens. Neural Blue ist der freigegebene Standard-Look und
+   bildet die bisherigen Werte (inkl. Radien je Breakpoint) exakt nach.
+
+   Weicher Theme-Wechsel: Die Tokens sind per @property registriert und werden
+   am Widget selbst transitioniert. Alle Verbraucher (auch Verlaeufe und
+   Schatten, die aus Tokens zusammengesetzt sind) folgen dadurch automatisch —
+   ohne zusaetzliche Transitions an Slider, Panel oder Vollbild. Browser ohne
+   @property wechseln einfach ohne Animation. */
+
+@property --assistant-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-header-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-panel-border { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-divider { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-shadow { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-panel-highlight { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-text-muted { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-label { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-status-dot { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-scrollbar { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-surface-assistant { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-border-assistant { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-text-assistant { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-bubble-highlight { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-bubble-drop { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-surface-user { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-user-tint-top { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-user-tint-bottom { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-border-user { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-text-user { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-user-highlight { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-loading-dot { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-pull-icon { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-chat-surface { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-composer-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-source-active-highlight { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-wallpaper-opacity { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --assistant-radius-user-tail-top { syntax: '<length-percentage>'; inherits: true; initial-value: 0px; }
+@property --assistant-radius-assistant-tail-top { syntax: '<length-percentage>'; inherits: true; initial-value: 0px; }
+@property --assistant-control-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-control-border { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-control-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-control-hover-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-control-hover-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-close-icon { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-close-icon-glow { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-nav-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-nav-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-nav-hover-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-prompt-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-prompt-border { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-prompt-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-prompt-hover-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-prompt-hover-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-prompt-highlight { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-prompt-hover-highlight { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-prompt-drop { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-pagination-active { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-pagination-inactive { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-pagination-hover { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-input-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-input-border { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-input-focus-border { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-input-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-input-placeholder { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-input-focus-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-send-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-send-border { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-send-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-send-drop { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-send-highlight { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-send-hover-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-send-hover-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-send-hover-drop { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-send-hover-highlight { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-accent { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-accent-hover { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-accent-soft { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-accent-border { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-accent-glow { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-danger { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-danger-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-danger-border { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-danger-glow { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-source-inactive { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-source-inactive-border { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-source-inactive-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-source-highlight { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-source-hover { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-source-hover-border { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-source-hover-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-source-active { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-source-active-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-source-focus { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-popover-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-popover-border { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-popover-text { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-popover-title { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-popover-muted { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-popover-shadow { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-popover-highlight { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-popover-close { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-popover-close-hover-bg { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-popover-link { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --assistant-radius-message { syntax: '<length-percentage>'; inherits: true; initial-value: 0px; }
+@property --assistant-radius-user-tail { syntax: '<length-percentage>'; inherits: true; initial-value: 0px; }
+@property --assistant-radius-assistant-tail { syntax: '<length-percentage>'; inherits: true; initial-value: 0px; }
+@property --assistant-radius-input { syntax: '<length-percentage>'; inherits: true; initial-value: 0px; }
+@property --assistant-radius-send { syntax: '<length-percentage>'; inherits: true; initial-value: 0px; }
+@property --assistant-radius-control { syntax: '<length-percentage>'; inherits: true; initial-value: 0px; }
+@property --assistant-radius-prompt { syntax: '<length-percentage>'; inherits: true; initial-value: 0px; }
+@property --assistant-radius-popover { syntax: '<length-percentage>'; inherits: true; initial-value: 0px; }
+
+/* ---------- Neural Blue (Standard) ---------- */
+#aiAssistantWidget,
+#aiAssistantWidget[data-assistant-theme='neural-blue'] {
+  --assistant-bg: #000000;
+  --assistant-header-bg: #000000;
+  --assistant-panel-border: #242426;
+  --assistant-divider: #1c1c1e;
+  --assistant-shadow: rgba(0, 0, 0, 0.76);
+  --assistant-panel-highlight: rgba(255, 255, 255, 0.055);
+  --assistant-text: #f2eee8;
+  --assistant-text-muted: #918d88;
+  --assistant-label: #8a8680;
+  --assistant-status-dot: #aaa6a1;
+  --assistant-scrollbar: #2e2e30;
+  --assistant-surface-assistant: #101011;
+  --assistant-border-assistant: #2c2c2e;
+  --assistant-text-assistant: #eae6e0;
+  --assistant-bubble-highlight: rgba(255, 255, 255, 0.035);
+  --assistant-bubble-drop: rgba(0, 0, 0, 0);
+  --assistant-surface-user: #0a0c11;
+  --assistant-user-tint-top: rgba(59, 130, 246, 0.16);
+  --assistant-user-tint-bottom: rgba(59, 130, 246, 0.08);
+  --assistant-border-user: rgba(59, 130, 246, 0.3);
+  --assistant-text-user: #ffffff;
+  --assistant-user-highlight: rgba(255, 255, 255, 0.05);
+  --assistant-loading-dot: #b8b3ad;
+  --assistant-pull-icon: rgba(255, 255, 255, 0.82);
+  --assistant-chat-surface: #000000;
+  --assistant-composer-bg: #000000;
+  --assistant-source-active-highlight: rgba(255, 255, 255, 0.06);
+  --assistant-wallpaper-opacity: 0;
+  --assistant-control-bg: #101011;
+  --assistant-control-border: #303032;
+  --assistant-control-text: #e8e4df;
+  --assistant-control-hover-bg: #19191a;
+  --assistant-control-hover-text: #fffdf9;
+  --assistant-close-icon: rgba(255, 255, 255, 0.72);
+  --assistant-close-icon-glow: rgba(255, 255, 255, 0.18);
+  --assistant-nav-bg: #0d0d0e;
+  --assistant-nav-text: #e5e1db;
+  --assistant-nav-hover-bg: #181819;
+  --assistant-prompt-bg: #0c0c0d;
+  --assistant-prompt-border: #29292b;
+  --assistant-prompt-text: #dedad4;
+  --assistant-prompt-hover-bg: #171718;
+  --assistant-prompt-hover-text: #fffdf9;
+  --assistant-prompt-highlight: rgba(255, 255, 255, 0.035);
+  --assistant-prompt-hover-highlight: rgba(255, 255, 255, 0.055);
+  --assistant-prompt-drop: rgba(0, 0, 0, 0);
+  --assistant-pagination-active: #f2eee8;
+  --assistant-pagination-inactive: #3d3d3f;
+  --assistant-pagination-hover: #706e6b;
+  --assistant-input-bg: #0b0b0c;
+  --assistant-input-border: rgba(59, 130, 246, 0.45);
+  --assistant-input-focus-border: rgba(59, 130, 246, 0.85);
+  --assistant-input-text: #f2eee8;
+  --assistant-input-placeholder: #77736f;
+  --assistant-input-focus-bg: #0d0d0e;
+  --assistant-send-bg: #171718;
+  --assistant-send-border: #3c3c3e;
+  --assistant-send-text: #fffdf9;
+  --assistant-send-drop: rgba(0, 0, 0, 0.42);
+  --assistant-send-highlight: rgba(255, 255, 255, 0.065);
+  --assistant-send-hover-bg: #121a2b;
+  --assistant-send-hover-text: #ffffff;
+  --assistant-send-hover-drop: rgba(0, 0, 0, 0.48);
+  --assistant-send-hover-highlight: rgba(255, 255, 255, 0.1);
+  --assistant-accent: #3b82f6;
+  --assistant-accent-hover: #60a5fa;
+  --assistant-accent-soft: rgba(59, 130, 246, 0.12);
+  --assistant-accent-border: rgba(59, 130, 246, 0.7);
+  --assistant-accent-glow: rgba(59, 130, 246, 0.28);
+  --assistant-danger: #f87171;
+  --assistant-danger-bg: rgba(239, 68, 68, 0.08);
+  --assistant-danger-border: rgba(239, 68, 68, 0.75);
+  --assistant-danger-glow: rgba(239, 68, 68, 0.28);
+  --assistant-source-inactive: rgba(255, 255, 255, 0.045);
+  --assistant-source-inactive-border: #303032;
+  --assistant-source-inactive-text: #cfcac4;
+  --assistant-source-highlight: rgba(255, 255, 255, 0.06);
+  --assistant-source-hover: rgba(255, 255, 255, 0.09);
+  --assistant-source-hover-border: #48484b;
+  --assistant-source-hover-text: #fffdf9;
+  --assistant-source-active: #f2eee8;
+  --assistant-source-active-text: #050506;
+  --assistant-source-focus: rgba(242, 238, 232, 0.55);
+  --assistant-popover-bg: rgba(13, 13, 14, 0.94);
+  --assistant-popover-border: #333335;
+  --assistant-popover-text: #eae6e0;
+  --assistant-popover-title: #f2eee8;
+  --assistant-popover-muted: #918d88;
+  --assistant-popover-shadow: rgba(0, 0, 0, 0.6);
+  --assistant-popover-highlight: rgba(255, 255, 255, 0.06);
+  --assistant-popover-close: #aaa6a1;
+  --assistant-popover-close-hover-bg: #19191a;
+  --assistant-popover-link: #cfcac4;
+  --assistant-radius-message: 21px;
+  --assistant-radius-user-tail: 21px;
+  --assistant-radius-assistant-tail: 21px;
+  --assistant-radius-user-tail-top: 21px;
+  --assistant-radius-assistant-tail-top: 21px;
+  --assistant-radius-input: 18px;
+  --assistant-radius-send: 18px;
+  --assistant-radius-control: 15px;
+  --assistant-radius-prompt: 18px;
+  --assistant-radius-popover: 16px;
+}
+
+#aiAssistantWidget {
+  --assistant-interaction-transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.18s ease;
+}
+
+/* ---------- Cosmic Green — heller Messenger-Chat: warmer Grund mit Doodle-Wallpaper, weisse eingehende und hellgruene ausgehende Bubbles mit Ecke oben, runde Controls. ---------- */
+#aiAssistantWidget[data-assistant-theme='cosmic-green'] {
+  --assistant-bg: #efeae2;
+  --assistant-header-bg: #f0f2f5;
+  --assistant-panel-border: #d1d7db;
+  --assistant-divider: #d9dee2;
+  --assistant-shadow: rgba(11, 20, 26, 0.3);
+  --assistant-panel-highlight: rgba(255, 255, 255, 0.8);
+  --assistant-text: #111b21;
+  --assistant-text-muted: #54656f;
+  --assistant-label: #667781;
+  --assistant-status-dot: #1fa855;
+  --assistant-scrollbar: #c5bdb0;
+  --assistant-surface-assistant: #ffffff;
+  --assistant-border-assistant: rgba(11, 20, 26, 0);
+  --assistant-text-assistant: #111b21;
+  --assistant-bubble-highlight: rgba(255, 255, 255, 0);
+  --assistant-bubble-drop: rgba(11, 20, 26, 0.13);
+  --assistant-surface-user: #d9fdd3;
+  --assistant-user-tint-top: rgba(0, 168, 132, 0);
+  --assistant-user-tint-bottom: rgba(0, 168, 132, 0);
+  --assistant-border-user: rgba(0, 168, 132, 0);
+  --assistant-text-user: #111b21;
+  --assistant-user-highlight: rgba(255, 255, 255, 0);
+  --assistant-loading-dot: #8696a0;
+  --assistant-pull-icon: #54656f;
+  --assistant-chat-surface: rgba(239, 234, 226, 0);
+  --assistant-composer-bg: #f0f2f5;
+  --assistant-source-active-highlight: rgba(255, 255, 255, 0);
+  --assistant-wallpaper-opacity: 1;
+  --assistant-control-bg: #ffffff;
+  --assistant-control-border: #d1d7db;
+  --assistant-control-text: #54656f;
+  --assistant-control-hover-bg: #e9edef;
+  --assistant-control-hover-text: #111b21;
+  --assistant-close-icon: #54656f;
+  --assistant-close-icon-glow: rgba(0, 0, 0, 0);
+  --assistant-nav-bg: #ffffff;
+  --assistant-nav-text: #54656f;
+  --assistant-nav-hover-bg: #f5f6f6;
+  --assistant-prompt-bg: #ffffff;
+  --assistant-prompt-border: #e4dfd7;
+  --assistant-prompt-text: #111b21;
+  --assistant-prompt-hover-bg: #f7f8fa;
+  --assistant-prompt-hover-text: #111b21;
+  --assistant-prompt-highlight: rgba(255, 255, 255, 0);
+  --assistant-prompt-hover-highlight: rgba(255, 255, 255, 0);
+  --assistant-prompt-drop: rgba(11, 20, 26, 0.1);
+  --assistant-pagination-active: #00a884;
+  --assistant-pagination-inactive: #c9c2b6;
+  --assistant-pagination-hover: #8696a0;
+  --assistant-input-bg: #ffffff;
+  --assistant-input-border: #ffffff;
+  --assistant-input-focus-border: rgba(0, 168, 132, 0.75);
+  --assistant-input-text: #111b21;
+  --assistant-input-placeholder: #667781;
+  --assistant-input-focus-bg: #ffffff;
+  --assistant-send-bg: #00a884;
+  --assistant-send-border: #00a884;
+  --assistant-send-text: #ffffff;
+  --assistant-send-drop: rgba(11, 20, 26, 0.18);
+  --assistant-send-highlight: rgba(255, 255, 255, 0.18);
+  --assistant-send-hover-bg: #008f72;
+  --assistant-send-hover-text: #ffffff;
+  --assistant-send-hover-drop: rgba(11, 20, 26, 0.22);
+  --assistant-send-hover-highlight: rgba(255, 255, 255, 0.22);
+  --assistant-accent: #00a884;
+  --assistant-accent-hover: #008f72;
+  --assistant-accent-soft: rgba(0, 168, 132, 0.14);
+  --assistant-accent-border: rgba(0, 168, 132, 0.6);
+  --assistant-accent-glow: rgba(0, 168, 132, 0.18);
+  --assistant-danger: #ea0038;
+  --assistant-danger-bg: rgba(234, 0, 56, 0.06);
+  --assistant-danger-border: rgba(234, 0, 56, 0.7);
+  --assistant-danger-glow: rgba(234, 0, 56, 0.14);
+  --assistant-source-inactive: #f0f2f5;
+  --assistant-source-inactive-border: #d1d7db;
+  --assistant-source-inactive-text: #3b4a54;
+  --assistant-source-highlight: rgba(255, 255, 255, 0);
+  --assistant-source-hover: #e9edef;
+  --assistant-source-hover-border: #b8c1c7;
+  --assistant-source-hover-text: #111b21;
+  --assistant-source-active: #111b21;
+  --assistant-source-active-text: #ffffff;
+  --assistant-source-focus: rgba(0, 168, 132, 0.6);
+  --assistant-popover-bg: rgba(255, 255, 255, 0.98);
+  --assistant-popover-border: #d1d7db;
+  --assistant-popover-text: #111b21;
+  --assistant-popover-title: #111b21;
+  --assistant-popover-muted: #54656f;
+  --assistant-popover-shadow: rgba(11, 20, 26, 0.18);
+  --assistant-popover-highlight: rgba(255, 255, 255, 0.9);
+  --assistant-popover-close: #667781;
+  --assistant-popover-close-hover-bg: #f0f2f5;
+  --assistant-popover-link: #3b4a54;
+  --assistant-radius-message: 9px;
+  --assistant-radius-user-tail: 9px;
+  --assistant-radius-assistant-tail: 9px;
+  --assistant-radius-user-tail-top: 2px;
+  --assistant-radius-assistant-tail-top: 2px;
+  --assistant-radius-input: 24px;
+  --assistant-radius-send: 50%;
+  --assistant-radius-control: 50%;
+  --assistant-radius-prompt: 18px;
+  --assistant-radius-popover: 10px;
+}
+
+/* ---------- Metallic Red — Graphit und Metall: harte Kanten, metallische Highlights, dunkles Rot, kontrollierter Glow. ---------- */
+#aiAssistantWidget[data-assistant-theme='metallic-red'] {
+  --assistant-bg: #09090a;
+  --assistant-header-bg: #111113;
+  --assistant-panel-border: #2a2a2e;
+  --assistant-divider: #1f1f23;
+  --assistant-shadow: rgba(0, 0, 0, 0.8);
+  --assistant-panel-highlight: rgba(255, 255, 255, 0.08);
+  --assistant-text: #f1f1f3;
+  --assistant-text-muted: #9a9aa2;
+  --assistant-label: #8b8b93;
+  --assistant-status-dot: #dc2626;
+  --assistant-scrollbar: #3a3a40;
+  --assistant-surface-assistant: #151517;
+  --assistant-border-assistant: #2c2c31;
+  --assistant-text-assistant: #e9e9ec;
+  --assistant-bubble-highlight: rgba(255, 255, 255, 0.08);
+  --assistant-bubble-drop: rgba(0, 0, 0, 0.35);
+  --assistant-surface-user: #160a0c;
+  --assistant-user-tint-top: rgba(220, 38, 38, 0.26);
+  --assistant-user-tint-bottom: rgba(127, 29, 29, 0.18);
+  --assistant-border-user: rgba(239, 68, 68, 0.42);
+  --assistant-text-user: #ffffff;
+  --assistant-user-highlight: rgba(255, 255, 255, 0.08);
+  --assistant-loading-dot: #a1a1aa;
+  --assistant-pull-icon: rgba(244, 244, 245, 0.82);
+  --assistant-chat-surface: #09090a;
+  --assistant-composer-bg: #09090a;
+  --assistant-source-active-highlight: rgba(255, 255, 255, 0.08);
+  --assistant-wallpaper-opacity: 0;
+  --assistant-control-bg: #141416;
+  --assistant-control-border: #33333a;
+  --assistant-control-text: #e4e4e7;
+  --assistant-control-hover-bg: #1c1c20;
+  --assistant-control-hover-text: #ffffff;
+  --assistant-close-icon: rgba(244, 244, 245, 0.72);
+  --assistant-close-icon-glow: rgba(255, 255, 255, 0.14);
+  --assistant-nav-bg: #121214;
+  --assistant-nav-text: #e4e4e7;
+  --assistant-nav-hover-bg: #1c1c20;
+  --assistant-prompt-bg: #121214;
+  --assistant-prompt-border: #2e2e34;
+  --assistant-prompt-text: #e0e0e4;
+  --assistant-prompt-hover-bg: #19191c;
+  --assistant-prompt-hover-text: #ffffff;
+  --assistant-prompt-highlight: rgba(255, 255, 255, 0.06);
+  --assistant-prompt-hover-highlight: rgba(255, 255, 255, 0.09);
+  --assistant-prompt-drop: rgba(0, 0, 0, 0.3);
+  --assistant-pagination-active: #f4f4f5;
+  --assistant-pagination-inactive: #3f3f46;
+  --assistant-pagination-hover: #71717a;
+  --assistant-input-bg: #111113;
+  --assistant-input-border: rgba(220, 38, 38, 0.42);
+  --assistant-input-focus-border: rgba(239, 68, 68, 0.85);
+  --assistant-input-text: #f1f1f3;
+  --assistant-input-placeholder: #74747c;
+  --assistant-input-focus-bg: #141416;
+  --assistant-send-bg: #1a1a1d;
+  --assistant-send-border: #3a3a41;
+  --assistant-send-text: #ffffff;
+  --assistant-send-drop: rgba(0, 0, 0, 0.5);
+  --assistant-send-highlight: rgba(255, 255, 255, 0.08);
+  --assistant-send-hover-bg: #2a0d10;
+  --assistant-send-hover-text: #ffffff;
+  --assistant-send-hover-drop: rgba(0, 0, 0, 0.55);
+  --assistant-send-hover-highlight: rgba(255, 255, 255, 0.1);
+  --assistant-accent: #dc2626;
+  --assistant-accent-hover: #ef4444;
+  --assistant-accent-soft: rgba(220, 38, 38, 0.14);
+  --assistant-accent-border: rgba(239, 68, 68, 0.72);
+  --assistant-accent-glow: rgba(220, 38, 38, 0.26);
+  --assistant-danger: #ffb0b0;
+  --assistant-danger-bg: rgba(255, 90, 90, 0.16);
+  --assistant-danger-border: rgba(255, 138, 138, 0.9);
+  --assistant-danger-glow: rgba(255, 90, 90, 0.35);
+  --assistant-source-inactive: rgba(255, 255, 255, 0.05);
+  --assistant-source-inactive-border: #34343a;
+  --assistant-source-inactive-text: #d4d4d8;
+  --assistant-source-highlight: rgba(255, 255, 255, 0.08);
+  --assistant-source-hover: rgba(255, 255, 255, 0.1);
+  --assistant-source-hover-border: #52525b;
+  --assistant-source-hover-text: #ffffff;
+  --assistant-source-active: #f4f4f5;
+  --assistant-source-active-text: #09090a;
+  --assistant-source-focus: rgba(244, 244, 245, 0.55);
+  --assistant-popover-bg: rgba(17, 17, 19, 0.96);
+  --assistant-popover-border: #34343a;
+  --assistant-popover-text: #e9e9ec;
+  --assistant-popover-title: #f4f4f5;
+  --assistant-popover-muted: #9a9aa2;
+  --assistant-popover-shadow: rgba(0, 0, 0, 0.65);
+  --assistant-popover-highlight: rgba(255, 255, 255, 0.08);
+  --assistant-popover-close: #a1a1aa;
+  --assistant-popover-close-hover-bg: #1c1c20;
+  --assistant-popover-link: #d4d4d8;
+  --assistant-radius-message: 10px;
+  --assistant-radius-user-tail: 10px;
+  --assistant-radius-assistant-tail: 10px;
+  --assistant-radius-user-tail-top: 10px;
+  --assistant-radius-assistant-tail-top: 10px;
+  --assistant-radius-input: 10px;
+  --assistant-radius-send: 10px;
+  --assistant-radius-control: 10px;
+  --assistant-radius-prompt: 8px;
+  --assistant-radius-popover: 10px;
+}
+
+/* ---------- Arctic White — Hell und minimal: Off-White, dunkler Text, weisse Karten mit feinen Schatten, kein Glow. ---------- */
+#aiAssistantWidget[data-assistant-theme='arctic-white'] {
+  --assistant-bg: #f7f8fa;
+  --assistant-header-bg: #ffffff;
+  --assistant-panel-border: #e3e6eb;
+  --assistant-divider: #e8ebef;
+  --assistant-shadow: rgba(15, 23, 42, 0.22);
+  --assistant-panel-highlight: rgba(255, 255, 255, 0.9);
+  --assistant-text: #16181d;
+  --assistant-text-muted: #5d6573;
+  --assistant-label: #6b7280;
+  --assistant-status-dot: #94a3b8;
+  --assistant-scrollbar: #cfd4db;
+  --assistant-surface-assistant: #ffffff;
+  --assistant-border-assistant: #e3e6eb;
+  --assistant-text-assistant: #1f2329;
+  --assistant-bubble-highlight: rgba(255, 255, 255, 0);
+  --assistant-bubble-drop: rgba(16, 24, 40, 0.06);
+  --assistant-surface-user: #eaf1fb;
+  --assistant-user-tint-top: rgba(37, 99, 235, 0.06);
+  --assistant-user-tint-bottom: rgba(37, 99, 235, 0.02);
+  --assistant-border-user: rgba(37, 99, 235, 0.22);
+  --assistant-text-user: #0f172a;
+  --assistant-user-highlight: rgba(255, 255, 255, 0.7);
+  --assistant-loading-dot: #9aa3af;
+  --assistant-pull-icon: #374151;
+  --assistant-chat-surface: #f7f8fa;
+  --assistant-composer-bg: #f7f8fa;
+  --assistant-source-active-highlight: rgba(255, 255, 255, 0);
+  --assistant-wallpaper-opacity: 0;
+  --assistant-control-bg: #ffffff;
+  --assistant-control-border: #dde1e7;
+  --assistant-control-text: #374151;
+  --assistant-control-hover-bg: #f3f5f8;
+  --assistant-control-hover-text: #111827;
+  --assistant-close-icon: #4b5563;
+  --assistant-close-icon-glow: rgba(0, 0, 0, 0);
+  --assistant-nav-bg: #ffffff;
+  --assistant-nav-text: #374151;
+  --assistant-nav-hover-bg: #f3f5f8;
+  --assistant-prompt-bg: #ffffff;
+  --assistant-prompt-border: #e3e6eb;
+  --assistant-prompt-text: #1f2937;
+  --assistant-prompt-hover-bg: #fbfcfd;
+  --assistant-prompt-hover-text: #0f172a;
+  --assistant-prompt-highlight: rgba(255, 255, 255, 0);
+  --assistant-prompt-hover-highlight: rgba(255, 255, 255, 0);
+  --assistant-prompt-drop: rgba(16, 24, 40, 0.06);
+  --assistant-pagination-active: #111827;
+  --assistant-pagination-inactive: #d1d5db;
+  --assistant-pagination-hover: #9ca3af;
+  --assistant-input-bg: #ffffff;
+  --assistant-input-border: #d5dae1;
+  --assistant-input-focus-border: rgba(37, 99, 235, 0.7);
+  --assistant-input-text: #111827;
+  --assistant-input-placeholder: #6b7280;
+  --assistant-input-focus-bg: #ffffff;
+  --assistant-send-bg: #111827;
+  --assistant-send-border: #111827;
+  --assistant-send-text: #ffffff;
+  --assistant-send-drop: rgba(16, 24, 40, 0.18);
+  --assistant-send-highlight: rgba(255, 255, 255, 0.1);
+  --assistant-send-hover-bg: #1f2937;
+  --assistant-send-hover-text: #ffffff;
+  --assistant-send-hover-drop: rgba(16, 24, 40, 0.22);
+  --assistant-send-hover-highlight: rgba(255, 255, 255, 0.12);
+  --assistant-accent: #2563eb;
+  --assistant-accent-hover: #1d4ed8;
+  --assistant-accent-soft: rgba(37, 99, 235, 0.12);
+  --assistant-accent-border: rgba(37, 99, 235, 0.55);
+  --assistant-accent-glow: rgba(37, 99, 235, 0.1);
+  --assistant-danger: #dc2626;
+  --assistant-danger-bg: rgba(220, 38, 38, 0.06);
+  --assistant-danger-border: rgba(220, 38, 38, 0.7);
+  --assistant-danger-glow: rgba(220, 38, 38, 0.12);
+  --assistant-source-inactive: #f3f4f6;
+  --assistant-source-inactive-border: #e2e5ea;
+  --assistant-source-inactive-text: #374151;
+  --assistant-source-highlight: rgba(255, 255, 255, 0.6);
+  --assistant-source-hover: #e9ecf0;
+  --assistant-source-hover-border: #cbd1d9;
+  --assistant-source-hover-text: #111827;
+  --assistant-source-active: #111827;
+  --assistant-source-active-text: #ffffff;
+  --assistant-source-focus: rgba(37, 99, 235, 0.55);
+  --assistant-popover-bg: rgba(255, 255, 255, 0.98);
+  --assistant-popover-border: #e3e6eb;
+  --assistant-popover-text: #1f2329;
+  --assistant-popover-title: #111827;
+  --assistant-popover-muted: #5d6573;
+  --assistant-popover-shadow: rgba(15, 23, 42, 0.14);
+  --assistant-popover-highlight: rgba(255, 255, 255, 0.9);
+  --assistant-popover-close: #6b7280;
+  --assistant-popover-close-hover-bg: #f3f5f8;
+  --assistant-popover-link: #374151;
+  --assistant-radius-message: 16px;
+  --assistant-radius-user-tail: 16px;
+  --assistant-radius-assistant-tail: 16px;
+  --assistant-radius-user-tail-top: 16px;
+  --assistant-radius-assistant-tail-top: 16px;
+  --assistant-radius-input: 14px;
+  --assistant-radius-send: 14px;
+  --assistant-radius-control: 12px;
+  --assistant-radius-prompt: 12px;
+  --assistant-radius-popover: 14px;
+}
+
+/* Radien je Breakpoint (Neural Blue = Legacy-Werte aus patches.css). */
+@media (max-width: 920px) {
+  #aiAssistantWidget,
+    #aiAssistantWidget[data-assistant-theme='neural-blue'] {
+    --assistant-radius-message: 21px;
+    --assistant-radius-user-tail: 21px;
+    --assistant-radius-assistant-tail: 21px;
+    --assistant-radius-user-tail-top: 21px;
+    --assistant-radius-assistant-tail-top: 21px;
+    --assistant-radius-input: 18px;
+    --assistant-radius-send: 18px;
+    --assistant-radius-control: 15px;
+    --assistant-radius-prompt: 999px;
+    --assistant-radius-popover: 16px;
+  }
+  #aiAssistantWidget[data-assistant-theme='cosmic-green'] {
+    --assistant-radius-message: 9px;
+    --assistant-radius-user-tail: 9px;
+    --assistant-radius-assistant-tail: 9px;
+    --assistant-radius-user-tail-top: 2px;
+    --assistant-radius-assistant-tail-top: 2px;
+    --assistant-radius-input: 24px;
+    --assistant-radius-send: 50%;
+    --assistant-radius-control: 50%;
+    --assistant-radius-prompt: 999px;
+    --assistant-radius-popover: 10px;
+  }
+  #aiAssistantWidget[data-assistant-theme='metallic-red'] {
+    --assistant-radius-message: 10px;
+    --assistant-radius-user-tail: 10px;
+    --assistant-radius-assistant-tail: 10px;
+    --assistant-radius-user-tail-top: 10px;
+    --assistant-radius-assistant-tail-top: 10px;
+    --assistant-radius-input: 10px;
+    --assistant-radius-send: 10px;
+    --assistant-radius-control: 10px;
+    --assistant-radius-prompt: 8px;
+    --assistant-radius-popover: 10px;
+  }
+  #aiAssistantWidget[data-assistant-theme='arctic-white'] {
+    --assistant-radius-message: 16px;
+    --assistant-radius-user-tail: 16px;
+    --assistant-radius-assistant-tail: 16px;
+    --assistant-radius-user-tail-top: 16px;
+    --assistant-radius-assistant-tail-top: 16px;
+    --assistant-radius-input: 14px;
+    --assistant-radius-send: 14px;
+    --assistant-radius-control: 12px;
+    --assistant-radius-prompt: 12px;
+    --assistant-radius-popover: 14px;
+  }
+}
+@media (max-width: 420px) {
+  #aiAssistantWidget,
+    #aiAssistantWidget[data-assistant-theme='neural-blue'] {
+    --assistant-radius-message: 21px;
+    --assistant-radius-user-tail: 21px;
+    --assistant-radius-assistant-tail: 21px;
+    --assistant-radius-user-tail-top: 21px;
+    --assistant-radius-assistant-tail-top: 21px;
+    --assistant-radius-input: 17px;
+    --assistant-radius-send: 17px;
+    --assistant-radius-control: 14px;
+    --assistant-radius-prompt: 999px;
+    --assistant-radius-popover: 16px;
+  }
+  #aiAssistantWidget[data-assistant-theme='cosmic-green'] {
+    --assistant-radius-message: 9px;
+    --assistant-radius-user-tail: 9px;
+    --assistant-radius-assistant-tail: 9px;
+    --assistant-radius-user-tail-top: 2px;
+    --assistant-radius-assistant-tail-top: 2px;
+    --assistant-radius-input: 24px;
+    --assistant-radius-send: 50%;
+    --assistant-radius-control: 50%;
+    --assistant-radius-prompt: 999px;
+    --assistant-radius-popover: 10px;
+  }
+  #aiAssistantWidget[data-assistant-theme='metallic-red'] {
+    --assistant-radius-message: 10px;
+    --assistant-radius-user-tail: 10px;
+    --assistant-radius-assistant-tail: 10px;
+    --assistant-radius-user-tail-top: 10px;
+    --assistant-radius-assistant-tail-top: 10px;
+    --assistant-radius-input: 10px;
+    --assistant-radius-send: 10px;
+    --assistant-radius-control: 10px;
+    --assistant-radius-prompt: 8px;
+    --assistant-radius-popover: 10px;
+  }
+  #aiAssistantWidget[data-assistant-theme='arctic-white'] {
+    --assistant-radius-message: 16px;
+    --assistant-radius-user-tail: 16px;
+    --assistant-radius-assistant-tail: 16px;
+    --assistant-radius-user-tail-top: 16px;
+    --assistant-radius-assistant-tail-top: 16px;
+    --assistant-radius-input: 14px;
+    --assistant-radius-send: 14px;
+    --assistant-radius-control: 12px;
+    --assistant-radius-prompt: 12px;
+    --assistant-radius-popover: 14px;
+  }
+}
+
+/* Theme-Wechsel: nur die Tokens animieren (opacity/visibility wie bisher). */
+#aiAssistantWidget.ai-assistant-widget {
+  transition:
+    opacity 240ms ease,
+    visibility 240ms ease,
+    --assistant-bg 360ms ease,
+    --assistant-header-bg 360ms ease,
+    --assistant-panel-border 360ms ease,
+    --assistant-divider 360ms ease,
+    --assistant-shadow 360ms ease,
+    --assistant-panel-highlight 360ms ease,
+    --assistant-text 360ms ease,
+    --assistant-text-muted 360ms ease,
+    --assistant-label 360ms ease,
+    --assistant-status-dot 360ms ease,
+    --assistant-scrollbar 360ms ease,
+    --assistant-surface-assistant 360ms ease,
+    --assistant-border-assistant 360ms ease,
+    --assistant-text-assistant 360ms ease,
+    --assistant-bubble-highlight 360ms ease,
+    --assistant-bubble-drop 360ms ease,
+    --assistant-surface-user 360ms ease,
+    --assistant-user-tint-top 360ms ease,
+    --assistant-user-tint-bottom 360ms ease,
+    --assistant-border-user 360ms ease,
+    --assistant-text-user 360ms ease,
+    --assistant-user-highlight 360ms ease,
+    --assistant-loading-dot 360ms ease,
+    --assistant-pull-icon 360ms ease,
+    --assistant-chat-surface 360ms ease,
+    --assistant-composer-bg 360ms ease,
+    --assistant-source-active-highlight 360ms ease,
+    --assistant-wallpaper-opacity 360ms ease,
+    --assistant-radius-user-tail-top 360ms ease,
+    --assistant-radius-assistant-tail-top 360ms ease,
+    --assistant-control-bg 360ms ease,
+    --assistant-control-border 360ms ease,
+    --assistant-control-text 360ms ease,
+    --assistant-control-hover-bg 360ms ease,
+    --assistant-control-hover-text 360ms ease,
+    --assistant-close-icon 360ms ease,
+    --assistant-close-icon-glow 360ms ease,
+    --assistant-nav-bg 360ms ease,
+    --assistant-nav-text 360ms ease,
+    --assistant-nav-hover-bg 360ms ease,
+    --assistant-prompt-bg 360ms ease,
+    --assistant-prompt-border 360ms ease,
+    --assistant-prompt-text 360ms ease,
+    --assistant-prompt-hover-bg 360ms ease,
+    --assistant-prompt-hover-text 360ms ease,
+    --assistant-prompt-highlight 360ms ease,
+    --assistant-prompt-hover-highlight 360ms ease,
+    --assistant-prompt-drop 360ms ease,
+    --assistant-pagination-active 360ms ease,
+    --assistant-pagination-inactive 360ms ease,
+    --assistant-pagination-hover 360ms ease,
+    --assistant-input-bg 360ms ease,
+    --assistant-input-border 360ms ease,
+    --assistant-input-focus-border 360ms ease,
+    --assistant-input-text 360ms ease,
+    --assistant-input-placeholder 360ms ease,
+    --assistant-input-focus-bg 360ms ease,
+    --assistant-send-bg 360ms ease,
+    --assistant-send-border 360ms ease,
+    --assistant-send-text 360ms ease,
+    --assistant-send-drop 360ms ease,
+    --assistant-send-highlight 360ms ease,
+    --assistant-send-hover-bg 360ms ease,
+    --assistant-send-hover-text 360ms ease,
+    --assistant-send-hover-drop 360ms ease,
+    --assistant-send-hover-highlight 360ms ease,
+    --assistant-accent 360ms ease,
+    --assistant-accent-hover 360ms ease,
+    --assistant-accent-soft 360ms ease,
+    --assistant-accent-border 360ms ease,
+    --assistant-accent-glow 360ms ease,
+    --assistant-danger 360ms ease,
+    --assistant-danger-bg 360ms ease,
+    --assistant-danger-border 360ms ease,
+    --assistant-danger-glow 360ms ease,
+    --assistant-source-inactive 360ms ease,
+    --assistant-source-inactive-border 360ms ease,
+    --assistant-source-inactive-text 360ms ease,
+    --assistant-source-highlight 360ms ease,
+    --assistant-source-hover 360ms ease,
+    --assistant-source-hover-border 360ms ease,
+    --assistant-source-hover-text 360ms ease,
+    --assistant-source-active 360ms ease,
+    --assistant-source-active-text 360ms ease,
+    --assistant-source-focus 360ms ease,
+    --assistant-popover-bg 360ms ease,
+    --assistant-popover-border 360ms ease,
+    --assistant-popover-text 360ms ease,
+    --assistant-popover-title 360ms ease,
+    --assistant-popover-muted 360ms ease,
+    --assistant-popover-shadow 360ms ease,
+    --assistant-popover-highlight 360ms ease,
+    --assistant-popover-close 360ms ease,
+    --assistant-popover-close-hover-bg 360ms ease,
+    --assistant-popover-link 360ms ease,
+    --assistant-radius-message 360ms ease,
+    --assistant-radius-user-tail 360ms ease,
+    --assistant-radius-assistant-tail 360ms ease,
+    --assistant-radius-input 360ms ease,
+    --assistant-radius-send 360ms ease,
+    --assistant-radius-control 360ms ease,
+    --assistant-radius-prompt 360ms ease,
+    --assistant-radius-popover 360ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #aiAssistantWidget.ai-assistant-widget {
+    transition: opacity 240ms ease, visibility 240ms ease;
+  }
+}
+
+/* Einklapp-Pfeil des Prompt-Sliders: patches.css faerbt ihn auf Desktop fest weiss. */
+@media (min-width: 921px) {
+  #aiAssistantWidget .ai-prompt-pull span {
+    border-right-color: var(--assistant-pull-icon) !important;
+    border-bottom-color: var(--assistant-pull-icon) !important;
+  }
+}
+
+/* ---------- Wallpaper (nur Cosmic Green sichtbar) ---------- */
+/* Eigenes Strich-Doodle-Muster im Stil heller Messenger-Chats (keine Logos,
+   keine fremde Grafik). Liegt als Ebene hinter Nachrichten, Slider und
+   Composer; die Deckkraft ist ein Token und blendet beim Theme-Wechsel weich. */
+#aiAssistantWidget .ai-chat-body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%22240%22 viewBox=%220 0 240 240%22%3E%3Cg fill=%22none%22 stroke=%22%238a7d68%22 stroke-opacity=%22.2%22 stroke-width=%221.6%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E %3Cpath d=%22M18 22h26a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H30l-8 7v-7h-4a6 6 0 0 1-6-6V28a6 6 0 0 1 6-6Z%22/%3E %3Cpath d=%22M92 30c-4-7-15-5-15 3 0 7 15 15 15 15s15-8 15-15c0-8-11-10-15-3Z%22/%3E %3Cpath d=%22m160 18 4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1Z%22/%3E %3Cpath d=%22M204 34h26v18h-26zM211 34l3-5h8l3 5%22/%3E%3Ccircle cx=%22217%22 cy=%2243%22 r=%225%22/%3E %3Cpath d=%22M28 96V76l16-4v20%22/%3E%3Ccircle cx=%2223%22 cy=%2296%22 r=%225%22/%3E%3Ccircle cx=%2239%22 cy=%2292%22 r=%225%22/%3E %3Ccircle cx=%2292%22 cy=%2292%22 r=%2213%22/%3E%3Cpath d=%22M86 88h.01M98 88h.01M86 97c3 3 9 3 12 0%22/%3E %3Cpath d=%22m146 96 34-16-12 34-6-12Z%22/%3E%3Cpath d=%22m162 102 18-22%22/%3E %3Cpath d=%22M206 104h22a8 8 0 0 0 0-16 11 11 0 0 0-21-3 7 7 0 0 0-1 19Z%22/%3E %3Cpath d=%22m30 136-10 18h9l-4 16 13-20h-9l5-14Z%22/%3E %3Cpath d=%22M86 166c0-18 12-28 28-30-2 16-12 28-28 30Zm0 0 14-15%22/%3E %3Ccircle cx=%22164%22 cy=%22152%22 r=%2214%22/%3E%3Cpath d=%22M164 144v8l6 4%22/%3E %3Cpath d=%22M204 142h28v20h-28zM204 142l14 11 14-11%22/%3E %3Cpath d=%22M24 208a14 14 0 1 0 14-14 11 11 0 0 1-14 14Z%22/%3E %3Cpath d=%22M78 200h22v16a8 8 0 0 1-8 8h-6a8 8 0 0 1-8-8Zm22 4h4a5 5 0 0 1 0 10h-4%22/%3E %3Cpath d=%22M150 212h14M157 205v14%22/%3E%3Ccircle cx=%22192%22 cy=%22214%22 r=%222.5%22/%3E%3Ccircle cx=%22216%22 cy=%22204%22 r=%222%22/%3E%3Ccircle cx=%22130%22 cy=%22186%22 r=%222%22/%3E%3Ccircle cx=%2260%22 cy=%22120%22 r=%222%22/%3E%3Ccircle cx=%22126%22 cy=%2258%22 r=%222.5%22/%3E %3C/g%3E%3C/svg%3E");
+  background-size: 240px 240px;
+  background-repeat: repeat;
+  opacity: var(--assistant-wallpaper-opacity);
+  pointer-events: none;
+}
+
+/* ---------- Design-Switcher ---------- */
+
+/* Header ueber dem Chat-Koerper stapeln, damit das Design-Popover nicht vom
+   Nachrichtenbereich (gleiche Ebene, spaeter im DOM) ueberdeckt wird. */
+#aiAssistantWidget .ai-chat-header {
+  z-index: 3;
+}
+
+#aiAssistantWidget .ai-chat-header-actions {
+  position: relative;
+}
+
+#aiAssistantWidget .ai-theme-switcher {
+  display: flex;
+}
+
+#aiAssistantWidget .ai-theme-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 50;
+  box-sizing: border-box;
+  width: min(264px, calc(100vw - 40px));
+  padding: 10px;
+  color: var(--assistant-popover-text);
+  background: var(--assistant-popover-bg);
+  border: 1px solid var(--assistant-popover-border);
+  border-radius: var(--assistant-radius-popover);
+  box-shadow:
+    0 18px 48px var(--assistant-popover-shadow),
+    inset 0 1px 0 var(--assistant-popover-highlight);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  animation: aiThemeMenuIn 180ms ease-out;
+}
+
+@keyframes aiThemeMenuIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+#aiAssistantWidget .ai-theme-menu-title {
+  margin: 2px 6px 8px;
+  color: var(--assistant-label);
+  font: 650 10px/1 var(--font-body), system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#aiAssistantWidget .ai-theme-options {
+  display: grid;
+  gap: 4px;
+}
+
+#aiAssistantWidget .ai-theme-option {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  color: var(--assistant-popover-text);
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: var(--assistant-interaction-transition);
+}
+
+#aiAssistantWidget .ai-theme-option:hover {
+  background: var(--assistant-control-hover-bg);
+  border-color: var(--assistant-popover-border);
+}
+
+#aiAssistantWidget .ai-theme-option.is-active {
+  background: var(--assistant-accent-soft);
+  border-color: var(--assistant-accent-border);
+}
+
+#aiAssistantWidget .ai-theme-option:focus-visible {
+  outline: 2px solid var(--assistant-accent);
+  outline-offset: 1px;
+}
+
+#aiAssistantWidget .ai-theme-option-text {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+#aiAssistantWidget .ai-theme-option-name {
+  color: var(--assistant-popover-title);
+  font: 650 12.5px/1.2 var(--font-body), system-ui, sans-serif;
+}
+
+#aiAssistantWidget .ai-theme-option-description {
+  overflow: hidden;
+  color: var(--assistant-popover-muted);
+  font: 500 11px/1.25 var(--font-body), system-ui, sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#aiAssistantWidget .ai-theme-option-check {
+  width: 16px;
+  height: 16px;
+  color: var(--assistant-accent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#aiAssistantWidget .ai-theme-option.is-active .ai-theme-option-check {
+  opacity: 1;
+}
+
+/* Mini-Vorschau je Preset: Flaeche, Assistant-Zeile, User-Zeile, Accent-Punkt.
+   Feste Vorschaufarben — sie zeigen das Ziel-Theme, nicht das aktuelle. */
+#aiAssistantWidget .ai-theme-swatch {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 30px;
+  overflow: hidden;
+  background: var(--swatch-bg);
+  border: 1px solid var(--swatch-border);
+  border-radius: 9px;
+}
+
+#aiAssistantWidget .ai-theme-swatch i {
+  position: absolute;
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+}
+
+#aiAssistantWidget .ai-theme-swatch i:nth-child(1) {
+  top: 6px;
+  left: 5px;
+  width: 18px;
+  background: var(--swatch-assistant);
+}
+
+#aiAssistantWidget .ai-theme-swatch i:nth-child(2) {
+  top: 16px;
+  right: 5px;
+  width: 20px;
+  background: var(--swatch-user);
+}
+
+#aiAssistantWidget .ai-theme-swatch i:nth-child(3) {
+  top: 6px;
+  right: 5px;
+  width: 6px;
+  background: var(--swatch-accent);
+}
+
+#aiAssistantWidget [data-theme-option='neural-blue'] {
+  --swatch-bg: #000000;
+  --swatch-border: #2c2c2e;
+  --swatch-assistant: #2a2a2d;
+  --swatch-user: #1d3a6e;
+  --swatch-accent: #3b82f6;
+}
+
+#aiAssistantWidget [data-theme-option='cosmic-green'] {
+  --swatch-bg: #efeae2;
+  --swatch-border: #d1d7db;
+  --swatch-assistant: #ffffff;
+  --swatch-user: #b7f0ad;
+  --swatch-accent: #00a884;
+}
+
+#aiAssistantWidget [data-theme-option='metallic-red'] {
+  --swatch-bg: linear-gradient(160deg, #1c1c1f, #09090a);
+  --swatch-border: #3a3a41;
+  --swatch-assistant: #3a3a40;
+  --swatch-user: #7f1d1d;
+  --swatch-accent: #dc2626;
+}
+
+#aiAssistantWidget [data-theme-option='arctic-white'] {
+  --swatch-bg: #f7f8fa;
+  --swatch-border: #d5dae1;
+  --swatch-assistant: #e3e6eb;
+  --swatch-user: #bcd0f2;
+  --swatch-accent: #111827;
+}
+
+/* Kleine Screens: drei Header-Controls sauber neben Titel und Icon. */
+@media (max-width: 420px) {
+  #aiAssistantWidget .ai-chat-header-actions {
+    gap: 6px;
+  }
+
+  #aiAssistantWidget .ai-chat-brand {
+    min-width: 0;
+  }
+
+  #aiAssistantWidget .ai-chat-brand > div {
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #aiAssistantWidget .ai-theme-menu { animation: none; }
+}

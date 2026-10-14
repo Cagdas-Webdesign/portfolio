@@ -45,7 +45,8 @@ export async function loadLegacyScripts() {
   started = true;
   installReadyShim();
   for (let i = 0; i < manifest.count; i++) {
-    await loadScript(`/legacy/block-${String(i).padStart(2, '0')}.js`);
+    // BASE_URL statt '/': funktioniert auch unter einem Unterpfad (GitHub Pages).
+    await loadScript(`${import.meta.env.BASE_URL}legacy/block-${String(i).padStart(2, '0')}.js`);
   }
   // The original page ran ScrollTrigger setups during initial parse and got
   // ScrollTrigger's automatic window-load refresh. Here the scripts load after

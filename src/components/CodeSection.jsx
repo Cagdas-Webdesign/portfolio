@@ -9,9 +9,6 @@ export default function CodeSection() {
           <div className="code-wrap" id="codeWrap">
             {"\n"}
             <div className="code-title">
-              <div className="section-kicker">
-                {"// Live Output"}
-              </div>
               <h2>
                 {"Code, der sichtbar wird."}
               </h2>

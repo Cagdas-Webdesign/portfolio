@@ -9,7 +9,6 @@
     window.__abSliderV72Ready=true;
 
     const slider=section.querySelector('.ab-slider');
-    const track=section.querySelector('.ab-track');
     const slides=Array.from(section.querySelectorAll('.ab-slide'));
     const dots=Array.from(section.querySelectorAll('.ab-dot'));
     const prev=section.querySelector('.ab-prev');

@@ -1,0 +1,577 @@
+/* ============================================================
+   ZERTIFIZIERTER SOCIAL MEDIA MANAGER — Post-Reveal
+   Website-Section → Social-Media-Post (White Mode) → Pro-Max-Geraet.
+   Praefix .smr-. Die Typografie der Headline/Subline/Icons kommt
+   unveraendert aus phase5-worldclass.css (.cert-network__*).
+
+   Einheit --p = Postbreite / 400. Bei Scale 1 ist der Post genau so
+   breit wie die Stage — deshalb sehen die vw-basierten Groessen der
+   bisherigen Section im Startzustand identisch aus.
+   ============================================================ */
+
+.smr .cert-network__stage {
+  display: block;
+  padding: 0;
+  container-type: inline-size;
+}
+
+.smr-world {
+  /* --k: 1 im Zoom-Modus, Endscale im nativen Endzustand (JS) */
+  --k: 1;
+  --w: calc(100cqw * var(--k));
+  --p: calc(var(--w) / 400);
+  /* 1vw / 1vh / 1px der urspruenglichen Section, mitskaliert */
+  --vw1: calc(var(--w) / 100);
+  --vh1: calc(var(--sh, 8px) * var(--k));
+  --px: calc(1px * var(--k));
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+}
+
+/* Startwerte schon im CSS: vor dem ersten JS-Frame ist nichts vom
+   Geraet oder der App-Oberflaeche zu sehen (kein FOUC). GSAP setzt
+   danach inline. */
+.smr:not(.smr--static) :is(.smr-chrome, .smr-post__head, .smr-post__foot, .smr-phone__frame) {
+  opacity: 0;
+}
+
+/* ---------- Geraet ---------- */
+
+.smr-phone {
+  position: absolute;
+  width: calc(var(--p) * 436);
+  height: calc(var(--p) * 904);
+}
+
+/* Burnt Copper / Dark Terracotta, gebuerstetes Metall mit feinem Glanz */
+.smr-phone__frame {
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--p) * 72);
+  background:
+    linear-gradient(118deg, rgba(255, 226, 206, 0.34) 0%, transparent 16%, transparent 80%, rgba(255, 214, 190, 0.2) 100%),
+    linear-gradient(160deg, #c9825f 0%, #9a4a2b 20%, #6e2c18 48%, #8c3f24 72%, #5a2413 100%);
+  box-shadow:
+    inset 0 0 0 calc(var(--p) * 1.2) rgba(255, 210, 186, 0.45),
+    inset 0 0 calc(var(--p) * 4) rgba(40, 12, 4, 0.8),
+    0 calc(var(--p) * 60) calc(var(--p) * 120) calc(var(--p) * -20) rgba(0, 0, 0, 0.85),
+    0 0 calc(var(--p) * 160) calc(var(--p) * -40) rgba(190, 90, 50, 0.35);
+}
+
+/* schwarzer Displayrand innerhalb des Metallrahmens */
+.smr-phone__frame::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--p) * 6);
+  border-radius: calc(var(--p) * 66);
+  background: #050505;
+}
+
+.smr-phone__key {
+  position: absolute;
+  width: calc(var(--p) * 4);
+  border-radius: calc(var(--p) * 3);
+  background: linear-gradient(90deg, #5a2413, #b86a45, #6e2c18);
+}
+
+.smr-phone__key.is-action { top: 17%; left: calc(var(--p) * -3); height: 4%; }
+.smr-phone__key.is-vol-up { top: 24%; left: calc(var(--p) * -3); height: 7.5%; }
+.smr-phone__key.is-vol-down { top: 33%; left: calc(var(--p) * -3); height: 7.5%; }
+.smr-phone__key.is-power { top: 27%; right: calc(var(--p) * -3); height: 11%; }
+.smr-phone__key.is-control { top: 56%; right: calc(var(--p) * -2.5); height: 6%; }
+
+/* ---------- Display: von Schwarz (Website) zu Weiss (App) ---------- */
+
+.smr-screen {
+  --smr-screen: 0;
+  position: absolute;
+  top: calc(var(--p) * 18);
+  left: calc(var(--p) * 18);
+  display: flex;
+  width: calc(var(--p) * 400);
+  height: calc(var(--p) * 868);
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: calc(var(--p) * 54);
+  color: #0a0a0a;
+  background: hsl(0 0% calc(var(--smr-screen) * 100%));
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.smr-island {
+  position: absolute;
+  top: calc(var(--p) * 12);
+  left: 50%;
+  z-index: 2;
+  width: calc(var(--p) * 120);
+  height: calc(var(--p) * 34);
+  border-radius: 999px;
+  background: #000000;
+  transform: translateX(-50%);
+}
+
+.smr-ico {
+  width: calc(var(--p) * 26);
+  height: calc(var(--p) * 26);
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+}
+
+.smr-status {
+  display: flex;
+  height: calc(var(--p) * 54);
+  padding: 0 calc(var(--p) * 34) 0 calc(var(--p) * 40);
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  font-size: calc(var(--p) * 16.5);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.smr-status__icons { display: inline-flex; align-items: center; gap: calc(var(--p) * 7); }
+
+.smr-status__icons svg {
+  height: calc(var(--p) * 12.5);
+  fill: currentColor;
+}
+
+.smr-status__icons .is-signal { width: calc(var(--p) * 18); }
+
+.smr-status__icons .is-wifi {
+  width: calc(var(--p) * 17);
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 2.1;
+}
+
+/* Akku wie iOS mit Prozentanzeige: gefuellte Pill, Zahl ausgespart */
+.smr-battery {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--p) * 1.5);
+}
+
+.smr-battery b {
+  display: grid;
+  width: calc(var(--p) * 27);
+  height: calc(var(--p) * 13.5);
+  place-items: center;
+  border-radius: calc(var(--p) * 4.2);
+  color: #ffffff;
+  background: #0a0a0a;
+  font-size: calc(var(--p) * 10.5);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.smr-battery i {
+  width: calc(var(--p) * 1.8);
+  height: calc(var(--p) * 4.5);
+  border-radius: 0 calc(var(--p) * 1.5) calc(var(--p) * 1.5) 0;
+  background: rgba(10, 10, 10, 0.4);
+}
+
+.smr-appbar {
+  display: flex;
+  height: calc(var(--p) * 46);
+  padding: 0 calc(var(--p) * 16);
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.smr-appbar__brand {
+  font-size: calc(var(--p) * 22);
+  font-weight: 760;
+  letter-spacing: -0.03em;
+}
+
+.smr-appbar__actions { display: inline-flex; gap: calc(var(--p) * 18); }
+
+/* ---------- Story-Leiste (neutral: Themen statt Personen) ---------- */
+
+.smr-stories {
+  display: flex;
+  height: calc(var(--p) * 88);
+  margin: 0;
+  padding: calc(var(--p) * 2) calc(var(--p) * 12) 0;
+  flex: 0 0 auto;
+  gap: calc(var(--p) * 12);
+  overflow: hidden;
+  border-bottom: 1px solid #efefef;
+  list-style: none;
+}
+
+.smr-stories li {
+  display: grid;
+  width: calc(var(--p) * 64);
+  flex: 0 0 auto;
+  justify-items: center;
+  gap: calc(var(--p) * 5);
+}
+
+.smr-stories {
+  --smr-ig: linear-gradient(45deg, #feda75 0%, #fa7e1e 28%, #d62976 55%, #962fbf 80%, #4f5bd5 100%);
+}
+
+/* Ring: exakter Kreis, gleiche Staerke fuer alle Stories */
+.smr-stories i {
+  position: relative;
+  display: grid;
+  width: calc(var(--p) * 64);
+  height: calc(var(--p) * 64);
+  box-sizing: border-box;
+  padding: calc(var(--p) * 3);
+  place-items: center;
+  border-radius: 50%;
+  background: var(--smr-ig);
+  font-style: normal;
+}
+
+.smr-stories i span {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  place-items: center;
+  border: calc(var(--p) * 3) solid #ffffff;
+  border-radius: 50%;
+  color: #262626;
+  background: #efeff2;
+  font-size: calc(var(--p) * 17);
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* „Deine Story“: bewusst eigener Zustand — grauer Ring, Plus-Badge */
+.smr-stories .is-mine i { background: #dbdbdb; }
+.smr-stories .is-mine i span { color: #ffffff; background: #0b0b0d; font-size: calc(var(--p) * 14); }
+
+.smr-stories .is-mine i::after {
+  content: "+";
+  position: absolute;
+  right: calc(var(--p) * 1);
+  bottom: calc(var(--p) * 1);
+  display: grid;
+  width: calc(var(--p) * 20);
+  height: calc(var(--p) * 20);
+  box-sizing: border-box;
+  place-items: center;
+  border: calc(var(--p) * 2) solid #ffffff;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #0095f6;
+  font-size: calc(var(--p) * 14);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.smr-stories em {
+  max-width: 100%;
+  overflow: hidden;
+  color: #262626;
+  font-size: calc(var(--p) * 11);
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Post ---------- */
+
+.smr-post {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+}
+
+.smr-post__head {
+  display: flex;
+  height: calc(var(--p) * 52);
+  padding: 0 calc(var(--p) * 12);
+  align-items: center;
+  gap: calc(var(--p) * 10);
+}
+
+.smr-avatar {
+  display: grid;
+  width: calc(var(--p) * 34);
+  height: calc(var(--p) * 34);
+  flex: 0 0 auto;
+  place-items: center;
+  border: calc(var(--p) * 1.5) solid #ffffff;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #0b0b0d;
+  box-shadow: 0 0 0 calc(var(--p) * 1.5) #e8465d;
+  font-size: calc(var(--p) * 12);
+  font-weight: 760;
+  letter-spacing: -0.03em;
+}
+
+.smr-avatar.is-ring {
+  padding: calc(var(--p) * 2);
+  box-sizing: border-box;
+  border: 0;
+  background: linear-gradient(45deg, #feda75 0%, #fa7e1e 28%, #d62976 55%, #962fbf 80%, #4f5bd5 100%);
+  box-shadow: none;
+}
+
+.smr-avatar.is-ring span {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  place-items: center;
+  border: calc(var(--p) * 2) solid #ffffff;
+  border-radius: 50%;
+  background: #0b0b0d;
+}
+
+.smr-avatar.is-small {
+  width: calc(var(--p) * 27);
+  height: calc(var(--p) * 27);
+  box-shadow: 0 0 0 calc(var(--p) * 1.5) #0a0a0a;
+  font-size: calc(var(--p) * 9.5);
+}
+
+.smr-post__who { display: grid; min-width: 0; gap: calc(var(--p) * 2); }
+.smr-post__who b { font-size: calc(var(--p) * 14); font-weight: 650; }
+.smr-post__who small { color: #737373; font-size: calc(var(--p) * 11.5); }
+.smr-ico.is-more { margin-left: auto; fill: currentColor; stroke: none; }
+
+/* Das Postbild ist die bisherige Section (dunkel) */
+.smr-post__media {
+  position: relative;
+  display: grid;
+  width: calc(var(--p) * 400);
+  height: calc(var(--p) * 455);
+  overflow: hidden;
+  place-items: center;
+  background: #000000;
+}
+
+.smr-post__foot {
+  display: grid;
+  height: calc(var(--p) * 96);
+  padding: calc(var(--p) * 8) calc(var(--p) * 14) 0;
+  box-sizing: border-box;
+  align-content: start;
+  gap: calc(var(--p) * 5);
+}
+
+.smr-post__actions {
+  display: flex;
+  gap: calc(var(--p) * 16);
+}
+
+.smr-ico.is-save { margin-left: auto; }
+
+.smr-post__likes,
+.smr-post__caption {
+  margin: 0;
+  font-size: calc(var(--p) * 13.5);
+  line-height: 1.35;
+}
+
+.smr-post__likes { font-weight: 650; }
+
+.smr-post__caption {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.smr-post__caption b { font-weight: 650; }
+.smr-post__caption span { color: #00376b; }
+
+/* ---------- Tabbar ---------- */
+
+.smr-tabbar {
+  display: flex;
+  height: calc(var(--p) * 54);
+  margin-top: auto;
+  padding: 0 calc(var(--p) * 10);
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-around;
+  border-top: 1px solid #efefef;
+}
+
+.smr-home {
+  width: calc(var(--p) * 134);
+  height: calc(var(--p) * 5);
+  margin: calc(var(--p) * 6) auto calc(var(--p) * 9);
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #0a0a0a;
+}
+
+/* ---------- Ruhezustand + CTA ---------- */
+
+/* Aeusserer Wrapper der Welt. Endzustand ist bewusst statisch (kein Float). */
+.smr-float {
+  position: absolute;
+  inset: 0;
+}
+
+/* Schaerfe: innerhalb der skalierten Welt keine eigenen Compositing-Ebenen
+   (will-change wuerde Text in Startgroesse als Bitmap einfrieren). */
+.smr .cert-network__intro,
+.smr .cert-network__subline .cert-word {
+  will-change: auto;
+}
+
+.smr-cta {
+  position: absolute;
+  right: 0;
+  bottom: clamp(26px, 4.5vh, 42px);
+  left: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px);
+  transition: opacity 500ms ease, transform 700ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 500ms;
+  pointer-events: none;
+}
+
+.smr.is-revealed .smr-cta {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 350ms, 350ms, 0s;
+  pointer-events: auto;
+}
+
+/* wie der weisse Button im Seitenkopf (.hx-btn--primary) */
+.smr-cta__button {
+  display: inline-flex;
+  min-height: 54px;
+  padding: 0 28px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #04060f;
+  background: #f4f6ff;
+  font: 600 15.5px/1 var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  cursor: pointer;
+  box-shadow: 0 0 34px -8px rgba(255, 190, 150, 0.35), 0 18px 46px rgba(0, 0, 0, 0.45);
+  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 250ms ease;
+}
+
+.smr-cta__button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.smr-cta__button:hover {
+  box-shadow: 0 0 44px -6px rgba(255, 190, 150, 0.5), 0 22px 50px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.smr-cta__button:hover svg { transform: translateX(3px); }
+.smr-cta__button:focus-visible { outline: 2px solid #ffffff; outline-offset: 3px; }
+
+/* Reduzierte Bewegung: direkt der Endzustand, kein langer Scrollweg */
+#certified-social-media-manager.smr--static { min-height: 100svh; }
+
+.smr--static .smr-screen { --smr-screen: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .smr-cta { transition: none; }
+}
+
+/* ------------------------------------------------------------
+   Intro-Typografie im Postbild: dieselben Werte wie in
+   phase5-worldclass.css, nur in mitskalierenden Einheiten
+   (vw → --vw1, vh → --vh1, px → --px). Bei --k = 1 identisch
+   mit der bisherigen Section; im nativen Endzustand echte Groesse.
+   ------------------------------------------------------------ */
+
+.smr .cert-network__intro { width: min(calc(var(--px) * 1120), calc(var(--vw1) * 92)); }
+
+.smr .cert-network__intro h2 {
+  padding-bottom: clamp(calc(var(--px) * 12), calc(var(--vw1) * 1.9), calc(var(--px) * 30));
+  margin-bottom: calc(-1 * clamp(calc(var(--px) * 12), calc(var(--vw1) * 1.9), calc(var(--px) * 30)));
+}
+
+.smr .cert-network__intro h2 span { font-size: clamp(calc(var(--px) * 42), calc(var(--vw1) * 5.3), calc(var(--px) * 82)); }
+.smr .cert-network__intro h2 strong { font-size: clamp(calc(var(--px) * 62), calc(var(--vw1) * 8.8), calc(var(--px) * 142)); }
+
+.smr .cert-network__subline {
+  max-width: calc(var(--px) * 640);
+  margin: clamp(calc(var(--px) * 24), calc(var(--vh1) * 3.5), calc(var(--px) * 38)) auto 0;
+  font-size: clamp(calc(var(--px) * 13), calc(var(--vw1) * 1.15), calc(var(--px) * 16));
+}
+
+.smr .cert-network__iconrow {
+  gap: clamp(calc(var(--px) * 11), calc(var(--vw1) * 1.2), calc(var(--px) * 15));
+  width: min(calc(var(--px) * 680), calc(var(--vw1) * 90));
+  margin: clamp(calc(var(--px) * 22), calc(var(--vh1) * 3.2), calc(var(--px) * 34)) auto 0;
+}
+
+.smr .cert-network__iconrow li {
+  width: clamp(calc(var(--px) * 40), calc(var(--vw1) * 3.4), calc(var(--px) * 46));
+  height: clamp(calc(var(--px) * 40), calc(var(--vw1) * 3.4), calc(var(--px) * 46));
+  border-radius: calc(var(--px) * 13);
+  box-shadow:
+    inset 0 var(--px) 0 rgba(255, 255, 255, 0.05),
+    0 0 calc(var(--px) * 16) color-mix(in srgb, var(--cert-accent) 7%, transparent),
+    0 calc(var(--px) * 10) calc(var(--px) * 24) rgba(0, 0, 0, 0.32);
+}
+
+.smr .cert-network__iconrow img {
+  width: clamp(calc(var(--px) * 20), calc(var(--vw1) * 1.7), calc(var(--px) * 23));
+  height: clamp(calc(var(--px) * 20), calc(var(--vw1) * 1.7), calc(var(--px) * 23));
+}
+
+@media (max-width: 700px) {
+  .smr .cert-network__intro { width: calc(var(--vw1) * 100 - var(--px) * 36); }
+  .smr .cert-network__intro h2 span { font-size: clamp(calc(var(--px) * 34), calc(var(--vw1) * 10.5), calc(var(--px) * 45)); }
+  .smr .cert-network__intro h2 strong { font-size: clamp(calc(var(--px) * 43), calc(var(--vw1) * 13.6), calc(var(--px) * 58)); }
+
+  .smr .cert-network__subline {
+    max-width: 32ch;
+    margin-top: calc(var(--px) * 21);
+    font-size: calc(var(--px) * 12);
+  }
+
+  .smr .cert-network__iconrow {
+    gap: calc(var(--px) * 9);
+    margin-top: calc(var(--px) * 19);
+  }
+
+  .smr .cert-network__iconrow li {
+    width: calc(var(--px) * 37);
+    height: calc(var(--px) * 37);
+    border-radius: calc(var(--px) * 11);
+  }
+
+  .smr .cert-network__iconrow img {
+    width: calc(var(--px) * 18);
+    height: calc(var(--px) * 18);
+  }
+}

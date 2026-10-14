@@ -1,54 +1,15 @@
 /* legacy inline script #0 id="anon" */
 
 gsap.registerPlugin(ScrollTrigger);
-const isMobile = window.innerWidth < 760;
 
-/* cursor */
-const cur=document.getElementById('cur'), curR=document.getElementById('curR');
-let mx=-100,my=-100,rx=-100,ry=-100;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
-function cursorLoop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;cur.style.transform=`translate(${mx-4}px,${my-4}px)`;curR.style.transform=`translate(${rx-21}px,${ry-21}px)`;requestAnimationFrame(cursorLoop)}cursorLoop();
-document.querySelectorAll('a,button,.exp-card,.engine-card,.auto-card').forEach(el=>{el.addEventListener('mouseenter',()=>{cur.style.width='20px';cur.style.height='20px';curR.style.width='66px';curR.style.height='66px';curR.style.borderColor='rgba(0,255,231,.58)'});el.addEventListener('mouseleave',()=>{cur.style.width='8px';cur.style.height='8px';curR.style.width='42px';curR.style.height='42px';curR.style.borderColor='rgba(0,255,231,.32)'})});
+/* Hero: neu gebaut in src/components/Hero.jsx mit eigener GSAP-Timeline.
+   Die frueheren Bloecke hier (Intro auf #heroTitle, Parallaxe auf #hgrid,
+   #hcode, #ho1..3 und .hero-badge) hatten keine Elemente mehr und sind
+   entfernt. Die Funnel-Icon-Bruecke weiter unten bleibt unveraendert. */
 
-/* hero */
-
-const heroWords = gsap.utils.toArray('#heroTitle .hero-word');
-gsap.set('#heroTitle',{opacity:1,y:0});
-let heroIntroTl;
-function playHeroIntro(){
-  if(!heroWords.length) return;
-  if(heroIntroTl) heroIntroTl.kill();
-  gsap.set(heroWords,{yPercent:112,rotateX:-18,opacity:0,filter:'blur(12px)'});
-  gsap.set('#heroActions',{opacity:0,y:22,scale:.98});
-  gsap.set('#scrollhint',{opacity:0});
-  heroIntroTl = gsap.timeline()
-    .to(heroWords,{
-      yPercent:0,
-      rotateX:0,
-      opacity:1,
-      filter:'blur(0px)',
-      duration:.92,
-      stagger:.105,
-      ease:'expo.out'
-    })
-    .to('#heroActions',{opacity:1,y:0,scale:1,duration:.58,ease:'power3.out'},'-=.34')
-    .to('#scrollhint',{opacity:1,duration:.4},'-=.2');
-}
-setTimeout(playHeroIntro,160);
-ScrollTrigger.create({
-  trigger:'#hero',
-  start:'top 78%',
-  end:'bottom top',
-  onEnter:playHeroIntro,
-  onEnterBack:playHeroIntro
-});
-document.querySelector('.logo')?.addEventListener('click',()=>{
-  window.scrollTo({top:0,behavior:'smooth'});
-  setTimeout(playHeroIntro,520);
-});
-
-gsap.to('#hgrid',{y:isMobile?-40:-130,scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:1}});gsap.to('#hcode',{y:isMobile?-35:-90,scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:1.8}});gsap.to('#ho1',{y:isMobile?-45:-160,scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:1.4}});gsap.to('#ho2',{y:isMobile?-35:-120,scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:1.7}});gsap.to('#ho3',{y:isMobile?-28:-95,scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:1.9}});document.querySelectorAll('.hero-badge').forEach((el,i)=>gsap.to(el,{y:`+=${8+i%3*5}`,duration:2.4+i*.22,repeat:-1,yoyo:true,ease:'sine.inOut'}));
-ScrollTrigger.create({trigger:'#stats',start:'top 74%',once:true,onEnter:()=>gsap.to('.stat',{opacity:1,y:0,duration:.65,stagger:.09,ease:'power3.out'})});
+/* Der frueher hier erzeugte ScrollTrigger zielte auf #stats/.stat. Die
+   Sektion existiert in der React-Fassung nicht mehr; der Trigger warnte bei
+   jedem Laden in der Konsole und ist entfernt. */
 
 /* funnel canvas: liquid-glass funnel only, badges are DOM/GSAP controlled */
 (function(){
@@ -168,12 +129,10 @@ ScrollTrigger.create({trigger:'#stats',start:'top 74%',once:true,onEnter:()=>gsa
 /* code */
 ScrollTrigger.create({trigger:'#code',start:'top 58%',once:true,onEnter:()=>{gsap.to('#codeWrap',{opacity:1,y:0,scale:1,duration:.85,ease:'power3.out'});gsap.to('.line',{opacity:1,x:0,duration:.32,stagger:.075,delay:.55});gsap.to('#outputLine',{opacity:1,duration:.45,delay:1.55})}});
 
-/* experience */
-gsap.set('.exp-card',{y:i=>i*52,scale:i=>1-i*.045,opacity:i=>1-i*.18});
-ScrollTrigger.create({trigger:'#experience',start:'top top',end:'bottom bottom',scrub:true,onUpdate:s=>{const p=s.progress;gsap.to('#expCopy',{opacity:Math.min(1,p*6),y:(1-Math.min(1,p*6))*24,duration:.1,overwrite:true});gsap.to('#expDevice',{opacity:Math.min(1,p*5),y:(1-Math.min(1,p*5))*38,scale:.96+Math.min(1,p*5)*.04,duration:.1,overwrite:true});document.querySelectorAll('.exp-card').forEach((c,i)=>{const local=Math.max(0,Math.min(1,(p-i*.18)*3.2));gsap.set(c,{y:i*52-local*38,scale:1-i*.045+local*.025,opacity:.55+local*.45,rotationX:(1-local)*5})})}});
+/* experience: the React carousel owns this section now. The old exp-card
+   ScrollTrigger targeted nodes that no longer exist and is intentionally inert. */
 
-/* cert */
-ScrollTrigger.create({trigger:'#cert',start:'top top',end:'bottom bottom',scrub:true,onUpdate:s=>{const p=s.progress;const enter=Math.min(1,p*4.5);const exit=p>.66?Math.max(0,1-(p-.66)*3):1;const o=enter*exit;gsap.set('#certAurora',{opacity:.08+enter*.72,scale:.82+enter*.22,rotation:p*10});gsap.set('#certBorder',{opacity:enter*.95});gsap.set('#certRings',{opacity:enter*.7,scale:.55+enter*.55});gsap.set(['#certPill','#certTitle','#certSub','#certBadges'],{opacity:o,y:(1-o)*24,scale:1-(1-o)*.045})}});
+/* certificate: the React Connected Network owns this section now. */
 
 /* platform connect v5 */
 
@@ -181,8 +140,8 @@ ScrollTrigger.create({trigger:'#cert',start:'top top',end:'bottom bottom',scrub:
 
 /* automation, engine, contact */
 document.querySelectorAll('.auto-card').forEach((card,i)=>{gsap.to(card,{scale:1-i*.035,scrollTrigger:{trigger:card,start:'top 72%',end:'bottom 25%',scrub:true}})});
-ScrollTrigger.create({trigger:'#content-engine',start:'top 70%',once:true,onEnter:()=>gsap.to('.engine-card',{opacity:1,y:0,duration:.7,stagger:.1,ease:'power3.out'})});
-ScrollTrigger.create({trigger:'#contact',start:'top 70%',once:true,onEnter:()=>gsap.to('.step',{opacity:1,y:0,duration:.55,stagger:.1,ease:'power3.out'})});
+if(document.querySelector('#content-engine')) ScrollTrigger.create({trigger:'#content-engine',start:'top 70%',once:true,onEnter:()=>gsap.to('.engine-card',{opacity:1,y:0,duration:.7,stagger:.1,ease:'power3.out'})});
+if(document.querySelector('#contact')) ScrollTrigger.create({trigger:'#contact',start:'top 70%',once:true,onEnter:()=>gsap.to('.step',{opacity:1,y:0,duration:.55,stagger:.1,ease:'power3.out'})});
 
 /* card mouse light */
 document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect();el.style.setProperty('--x',`${e.clientX-r.left}px`);el.style.setProperty('--y',`${e.clientY-r.top}px`)})});
@@ -604,31 +563,7 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
   window.addEventListener('resize',function(){updateHero(0);updateFunnel(0);},{passive:true});
   updateHero(0); updateFunnel(0);
 
-  // Kill aggressive old cert ScrollTrigger only visually by overriding properties every frame of cert.
-  ScrollTrigger.create({
-    trigger:'#cert',
-    start:'top top',
-    end:'bottom bottom',
-    scrub:1.1,
-    onUpdate:function(self){
-      const p=self.progress;
-      const enter=ease(p/.22);
-      const hold=1-ease((p-.78)/.20);
-      const o=enter*hold;
-      const cert=document.querySelector('#cert .cert-stage');
-      if(cert){
-        cert.style.setProperty('--v12CertPanel', (.25 + enter*.72).toFixed(3));
-        cert.style.setProperty('--v12CertAurora', (.18 + enter*.42).toFixed(3));
-        cert.style.setProperty('--v12CertRings', (enter*.38).toFixed(3));
-      }
-      gsap.set('#certPill',{opacity:o,y:(1-o)*18,scale:1-(1-o)*.025,rotationX:0});
-      gsap.set('#certTitle',{opacity:o,y:(1-o)*24,scale:1-(1-o)*.035,rotationX:0,z:0});
-      gsap.set('#certSub',{opacity:o,y:(1-o)*18,scale:1});
-      gsap.set('#certBadges',{opacity:o,y:(1-o)*18,scale:1});
-      gsap.set('#certBadges span',{y:0,opacity:1});
-      gsap.set('#certRings',{rotation:p*18,scale:.92+enter*.16});
-    }
-  });
+  // The former certificate controller was retired with the old glass card.
 })();
 
 
@@ -1119,9 +1054,273 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
   const portalGroup=funnelVisual ? funnelVisual.querySelector('.v33-funnel-portal-group') : null;
   const output=document.getElementById('funnelOutput');
 
+  /*
+    Unter 960px richten sich die Icons an der tatsaechlichen Glasflaeche des
+    Hero (.hx-inner::before) aus — wie auf Desktop, nur kompakter.
+      Handy (<720px): handgesetzte Komposition PHONE_LAYOUT (siehe unten).
+      Tablet (720-959px): Jedes Icon bekommt einen unregelmaessigen Platz in
+      einem Band ueber/unter bzw. links/rechts neben der Flaeche und eine
+      leicht eigene Groesse; ein Kollisionsschritt schiebt sich ueberlappende
+      Icons auseinander, ohne dass sie ihr Band verlassen.
+    Desktop (>=960px) nutzt unveraendert die feste Tabelle in heroFloat().
+  */
+  const heroInner=document.querySelector('#hero .hx-inner');
+  const COMPACT_MAX=960;
+  const COMPACT_GAP=10;
+  /* Feste, bewusst unregelmaessige Streuwerte: deterministisch, damit die Icons
+     nicht bei jedem Scroll-Frame neu springen. */
+  const SCATTER_X=[.34,-.3,.1,-.42,.24,-.06,.4,-.2,.02,-.36,.28,-.12,.32,-.38];
+  const SCATTER_SIZE=[1,.93,1.05,.96,.9,1.03,.95,1.06,.92,1,.97,1.04,.91,.98];
+  const PHI=.618034;
+  const PAIR_GAP=6;
+
+  let compactCache=null;
+
+  function heroWave(i){ return Math.sin(i*.7)*12; }
+
+  /*
+    Handy (<720px): handgesetzte Komposition statt berechneter Verteilung.
+    Ein "eingefangener Ausschnitt" des Desktop-Looks — bewusst asymmetrisch:
+    Icons duerfen am Bildschirmrand angeschnitten sein, an der Glaskante
+    andocken, seitlich hinter der Glasflaeche liegen (dort nur neben der
+    Headline, nie hinter den Buttons) und unterhalb des ersten Viewports
+    liegen. Die Icons scrollen mit der Seite (Faktor p: oben etwas schneller,
+    unten etwas langsamer — Parallaxe, und der Abstand zum Inhalt waechst
+    beim Scrollen nur). Tiefe ueber Groesse und Deckkraft.
+      x: Anteil der Viewportbreite (Mitte), <0 bzw. >1 = angeschnitten
+      at: Bezug fuer y — 'top' (Band zwischen Header und Flaeche, v 0..1),
+          'surfTop'/'surfBottom' (Glaskante + dy), 'title' (Headline, v 0..1)
+  */
+  const PHONE_LAYOUT=[
+    /* WordPress   */ {x:.15, at:'top', v:.18, s:.86, o:.92, r:-7, p:1.14},
+    /* Elementor   */ {x:.40, at:'surfTop', dy:-26, s:.68, o:.6, r:9, p:1.04},
+    /* WooCommerce */ {x:.64, at:'top', v:.04, s:.76, o:.78, r:-4, p:1.2},
+    /* API         */ {x:.93, at:'top', v:.6, s:.92, o:.95, r:6, p:1.1},
+    /* HTML        */ {x:.05, at:'surfTop', dy:4, s:.72, o:.7, r:11, p:1.02},
+    /* CSS         */ {x:-.015, at:'title', v:.56, s:.66, o:.5, r:-10, p:1},
+    /* JavaScript  */ {x:1.015, at:'title', v:.14, s:.72, o:.58, r:8, p:1},
+    /* PHP         */ {x:.2, at:'surfBottom', dy:44, s:.84, o:.9, r:-6, p:.93},
+    /* GitHub      */ {x:.58, at:'surfBottom', dy:24, s:.78, o:.84, r:5, p:.96},
+    /* HubSpot     */ {x:.91, at:'surfBottom', dy:84, s:.9, o:.92, r:-9, p:.9},
+    /* Zapier      */ {x:.05, at:'surfBottom', dy:160, s:.74, o:.68, r:7, p:.86},
+    /* Make        */ {x:.43, at:'surfBottom', dy:132, s:.95, o:.96, r:-3, p:.9},
+    /* n8n         */ {x:.7, at:'surfBottom', dy:204, s:.76, o:.74, r:10, p:.86},
+    /* Slack       */ {x:.26, at:'surfBottom', dy:282, s:.86, o:.86, r:-8, p:.88}
+  ];
+
+  function phoneComposition(g){
+    /* Kurze Displays: Zwischen Header und Glaskante bleibt wenig Raum. Dann
+       wird die obere Gruppe kleiner, statt in die Headline zu rutschen. */
+    const topRoom=g.surfaceTop-(g.headH+8);
+    const topFit=clamp(topRoom/(1.7*g.heights[0]*.86), .62, 1);
+    const slots=PHONE_LAYOUT.slice(0,badges.length).map(function(d,i){
+      const boxH=g.heights[i]-4;
+      const upper=d.at==='top' || d.at==='surfTop';
+      const sc=upper ? d.s*topFit : d.s;
+      const half=boxH*sc/2;
+      let cy;
+      if(d.at==='top'){
+        /* Band zwischen Header und Glaskante; auf kurzen Displays schrumpft es
+           und die Icons ruecken zusammen, statt unter den Header zu geraten. */
+        const lo=g.headH+8+half, hi=Math.max(lo, g.surfaceTop-half+4);
+        cy=lo+d.v*(hi-lo);
+      } else if(d.at==='surfTop'){
+        cy=Math.max(g.headH+8+half, g.surfaceTop+d.dy*topFit);
+      } else if(d.at==='title'){
+        cy=g.titleTop+d.v*(g.titleBottom-g.titleTop);
+      } else {
+        cy=g.surfaceBottom+d.dy;
+      }
+      let cx=d.x*g.w;
+      /* Ruhezustand: nicht unter den Chat-Button — dann nach links ausweichen. */
+      const ringHalf=g.ringW*sc/2+10;
+      if(g.chat && cy+half>g.chat.t && cy-half<g.chat.b && cx+ringHalf>g.chat.l){
+        cx=g.chat.l-ringHalf;
+      }
+      return {cx:cx, cy:cy, s:sc, o:d.o, r:d.r, p:d.p};
+    });
+    return {slots:slots, boxW:g.boxW, heights:g.heights};
+  }
+
+  function compactHeroSlots(w,h){
+    if(!heroInner || !hero || !badges.length) return null;
+    const tablet=w>=720;
+    const scroll=window.scrollY || window.pageYOffset || 0;
+    const rect=heroInner.getBoundingClientRect();
+    const before=getComputedStyle(heroInner,'::before');
+    const padY=Math.abs(parseFloat(before.top)) || 0;
+    const padX=Math.abs(parseFloat(before.left)) || 0;
+    const surfaceTop=rect.top+scroll-hero.offsetTop-padY;
+    const surfaceBottom=rect.bottom+scroll-hero.offsetTop+padY;
+    const surfaceLeft=rect.left-padX;
+    const surfaceRight=rect.right+padX;
+    const headH=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--shell-head-h')) || 64;
+    /* Footprint eines Icons (unskaliert): Ring samt Leuchtsaum in der Breite,
+       Ring plus Name in der Hoehe, mit Zuschlag fuer die Neigung (die Namen
+       schwenken seitlich mit). Die Badge-Box selbst ist breiter als das
+       Sichtbare, weil sie Platz fuer lange Namen reserviert. */
+    const ring=badges[0].querySelector('.tool-bridge-ring');
+    const footW=((ring && ring.offsetWidth) || 56)+20;
+    const boxW=badges[0].offsetWidth || 70;
+    const heights=badges.map(function(b){ return (b.offsetHeight || 73)+4; });
+    /* Typische Hoehe fuer die Platzschaetzung: ein einzelnes zweizeiliges
+       Label soll nicht eine ganze Band-Ebene kosten. */
+    const typH=heights.slice().sort(function(x,y){ return x-y; })[heights.length>>1];
+
+    /* Schwebender Chat-Button unten rechts: Hindernis, keine harte Untergrenze. */
+    let chat=null;
+    const chatToggle=document.querySelector('#aiAssistantWidget .ai-chat-toggle');
+    if(chatToggle){
+      const t=chatToggle.getBoundingClientRect();
+      if(t.width>0 && t.top>0) chat={l:t.left-8,t:t.top-8,r:t.right+8,b:t.bottom+8};
+    }
+
+    /* Ergebnis nur neu berechnen, wenn sich die Geometrie aendert — update()
+       laeuft bei jedem Scroll-Frame. */
+    const cacheKey=[w,h,surfaceTop,surfaceBottom,surfaceLeft,surfaceRight,headH,footW,boxW,
+      chat ? [chat.l,chat.t,chat.r,chat.b].join(',') : '-', heights.join(',')].map(function(v){
+        return typeof v==='number' ? Math.round(v) : v; }).join('|');
+    const titleEl=heroInner.querySelector('.hx-title');
+    const titleRect=titleEl ? titleEl.getBoundingClientRect() : rect;
+    const titleTop=titleRect.top+scroll-hero.offsetTop;
+    const titleBottom=titleRect.bottom+scroll-hero.offsetTop;
+    const phoneKey=cacheKey+'|'+Math.round(titleTop)+','+Math.round(titleBottom);
+    if(compactCache && compactCache.key===phoneKey) return compactCache.result;
+    if(!tablet){
+      const phone=phoneComposition({w:w, h:h, headH:headH, surfaceTop:surfaceTop, surfaceBottom:surfaceBottom,
+        titleTop:titleTop, titleBottom:titleBottom, chat:chat, heights:heights, boxW:boxW,
+        ringW:(ring && ring.offsetWidth) || 56});
+      compactCache={key:phoneKey, result:phone};
+      return phone;
+    }
+
+    const edge=tablet ? 18 : 4;
+    const bandTop=headH+6;
+    /* Oben duerfen Icons knapp (6px) hinter die Glaskante tauchen — die Schrift
+       beginnt erst nach dem Innenabstand der Flaeche. Unten genauso. */
+    const DIP=6;
+
+    function capacity(band,fw,fh){
+      const bw=band.x1-band.x0, bh=band.y1-band.y0;
+      if(bw<fw || bh<fh) return 0;
+      return Math.floor((bw+PAIR_GAP)/(fw+PAIR_GAP))*(1+Math.floor((bh-fh)/(fh+PAIR_GAP)));
+    }
+
+    function plan(scale){
+      const fw=footW*scale*1.03, fh=typH*scale*1.03;
+      const bands={
+        top:{x0:edge, x1:w-edge, y0:bandTop, y1:surfaceTop+DIP},
+        bottom:{x0:edge, x1:w-edge, y0:surfaceBottom-DIP,
+          /* Nicht beliebig tief: die Icons sollen um die Flaeche schweben. */
+          y1:Math.min(h-8, surfaceBottom+COMPACT_GAP+(tablet ? 2.4 : 3.3)*fh)}
+      };
+      /* Tablet: je 2 Icons links/rechts, wenn neben der Flaeche Platz ist. */
+      const sideSpace=Math.min(surfaceLeft, w-surfaceRight);
+      let sides=0;
+      if(tablet && sideSpace-edge>=fw+8){
+        sides=2;
+        bands.left={x0:edge, x1:surfaceLeft-8, y0:surfaceTop+12, y1:surfaceBottom-12};
+        bands.right={x0:surfaceRight+8, x1:w-edge, y0:surfaceTop+12, y1:surfaceBottom-12};
+      }
+      const capTop=capacity(bands.top,fw,fh);
+      let capBottom=capacity(bands.bottom,fw,fh);
+      if(chat) capBottom=Math.max(0, capBottom-1);
+      const rest=badges.length-2*sides;
+      /* Etwa 40 % oben, der Rest unten — begrenzt durch den jeweiligen Platz. */
+      let top=Math.min(capTop, Math.round(rest*.42));
+      if(rest-top>capBottom) top=Math.min(capTop, rest-capBottom);
+      const bottom=rest-top;
+      return {bands:bands, sides:sides, top:top, bottom:bottom, fits:bottom<=capBottom};
+    }
+
+    let scale=tablet ? .9 : .82;
+    const minScale=tablet ? .7 : .6;
+    let p=plan(scale);
+    while(!p.fits && scale>minScale){
+      scale=Math.max(minScale, scale-.03);
+      p=plan(scale);
+    }
+
+    const slots=[];
+    /* n Icons frei in einem Band verteilen: x grob gleichmaessig mit starkem,
+       unregelmaessigem Versatz, y nach goldenem Schnitt — ergibt keine Reihe. */
+    function scatter(band,count,seed){
+      const start=slots.length;
+      for(let k=0;k<count;k++){
+        const i=start+k;
+        const s=scale*SCATTER_SIZE[i%SCATTER_SIZE.length];
+        const fw=footW*s, fh=heights[i]*s;
+        const spanX=Math.max(0, band.x1-band.x0-fw);
+        const spanY=Math.max(0, band.y1-band.y0-fh);
+        const u=clamp((k+.5+SCATTER_X[i%SCATTER_X.length])/count,0,1);
+        const v=((seed+k*PHI)%1+1)%1;
+        slots.push({cx:band.x0+fw/2+u*spanX, cy:band.y0+fh/2+v*spanY, s:s, w:fw, h:fh, band:band});
+      }
+    }
+    scatter(p.bands.top, p.top, .23);
+    if(p.sides){
+      scatter(p.bands.left, p.sides, .71);
+      scatter(p.bands.right, p.sides, .12);
+    }
+    scatter(p.bands.bottom, p.bottom, .47);
+
+    function keepInBand(a){
+      const b=a.band;
+      a.cx=b.x1-b.x0<=a.w ? (b.x0+b.x1)/2 : clamp(a.cx, b.x0+a.w/2, b.x1-a.w/2);
+      a.cy=b.y1-b.y0<=a.h ? (b.y0+b.y1)/2 : clamp(a.cy, b.y0+a.h/2, b.y1-a.h/2);
+    }
+    /* Der Chat-Button ist ein festes Hindernis, das selbst nie ausweicht. */
+    const bodies=slots.slice();
+    if(chat) bodies.push({cx:(chat.l+chat.r)/2, cy:(chat.t+chat.b)/2, w:chat.r-chat.l-PAIR_GAP, h:chat.b-chat.t-PAIR_GAP, fixed:true});
+    function push(A,B,key,dir,amount){
+      if(A.fixed){ B[key]+=dir*amount; keepInBand(B); return; }
+      if(B.fixed){ A[key]-=dir*amount; keepInBand(A); return; }
+      const start=B[key]-A[key];
+      A[key]-=dir*amount/2; B[key]+=dir*amount/2;
+      keepInBand(A); keepInBand(B);
+      /* Steckt eines am Bandrand fest, uebernimmt das andere den Rest. */
+      let rest=amount-dir*(B[key]-A[key]-start);
+      if(rest>.5){ B[key]+=dir*rest; keepInBand(B); rest=amount-dir*(B[key]-A[key]-start); }
+      if(rest>.5){ A[key]-=dir*rest; keepInBand(A); }
+    }
+    /* Ueberlappende Paare entlang der kleineren Ueberdeckung auseinanderschieben.
+       Jeder dritte Durchgang nimmt die andere Achse — so loest sich auch ein
+       Paar, das in der bevorzugten Richtung am Bandrand klemmt. */
+    for(let it=0; it<160; it++){
+      let moved=false;
+      for(let a=0;a<bodies.length;a++){
+        for(let b=a+1;b<bodies.length;b++){
+          const A=bodies[a], B=bodies[b];
+          const dx=B.cx-A.cx, dy=B.cy-A.cy;
+          const ox=(A.w+B.w)/2+PAIR_GAP-Math.abs(dx);
+          const oy=(A.h+B.h)/2+PAIR_GAP-Math.abs(dy);
+          if(ox<=0 || oy<=0) continue;
+          moved=true;
+          if((oy<ox) !== (it%3===2)) push(A,B,'cy',dy>=0?1:-1,oy);
+          else push(A,B,'cx',dx>=0?1:-1,ox);
+        }
+      }
+      if(!moved) break;
+    }
+    const result={slots:slots, boxW:boxW, heights:heights};
+    compactCache={key:phoneKey, result:result};
+    return result;
+  }
+
+  let compactSlots=null;
+
   function heroFloat(i,w,h){
     const mobile=w<720;
     const badgeW=mobile?70:94;
+    if(w<COMPACT_MAX && compactSlots && compactSlots.slots[i]){
+      const slot=compactSlots.slots[i];
+      /* heroWave wird in update() addiert — hier vorab abziehen, damit das Icon
+         im Ruhezustand exakt auf seinem Platz steht. */
+      /* Handy: Icons scrollen mit der Seite (Faktor p), Tablet bleibt stehen. */
+      const lift=slot.p ? (window.scrollY || window.pageYOffset || 0)*slot.p : 0;
+      return {x:slot.cx-compactSlots.boxW/2,y:slot.cy-(compactSlots.heights[i]-4)/2-heroWave(i)-lift,s:slot.s,
+        r:slot.r!=null ? slot.r : (i%2?-1:1)*(3+((i*7)%5)*1.7),o:slot.o || .88,z:70+i};
+    }
     const desktop=[
       [.10,.18],[.25,.13],[.40,.16],[.60,.16],[.75,.13],[.90,.18],
       [.12,.42],[.28,.56],[.72,.56],[.88,.42],
@@ -1215,6 +1414,22 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
     return {x:w/2-badgeW/2,y:mobile?h*.755:h*.80,s:.03,r:0,o:0,z:240};
   }
 
+  /*
+    Versatz, mit dem die Icons nacheinander in den Trichter fallen (das zuletzt
+    im Hero stehende zuerst). Der groesste Versatz muss so klein bleiben, dass
+    auch das letzte Icon (WordPress) Muendung -> Inneres -> Sammeln komplett
+    durchlaeuft, bevor die harte Abschaltung bei inFunnel .965 greift.
+    Frueher: fester Schritt je Icon (Handy .040, Desktop .022) — bei 14 Icons
+    begann der Fall von WordPress, Elementor und WooCommerce erst nach der
+    Abschaltung, sie verschwanden direkt aus der Reihe.
+  */
+  const DROP_SPREAD_MOBILE=.16;
+  const DROP_SPREAD_DESKTOP=.17;
+  function dropDelay(reverseIndex, isMobile){
+    const spread=isMobile ? DROP_SPREAD_MOBILE : DROP_SPREAD_DESKTOP;
+    return reverseIndex*spread/Math.max(1, badges.length-1);
+  }
+
   function apply(el,p,wave){
     el.style.opacity=p.o.toFixed(3);
     el.style.transform='translate3d('+p.x.toFixed(2)+'px,'+(p.y+(wave||0)).toFixed(2)+'px,'+p.z.toFixed(2)+'px) rotate('+p.r.toFixed(2)+'deg) scale('+p.s.toFixed(3)+')';
@@ -1226,9 +1441,13 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
 
   function update(){
     if(!badges.length || !hero || !funnel) { return; }
+    /* Waehrend eine Service-Detailansicht den Body fixiert, ist window.scrollY
+       nicht die echte Seitenposition. Zustand einfrieren statt falsch rechnen. */
+    if(document.documentElement.classList.contains('services-experience-active')) { return; }
     const w=window.innerWidth;
     const h=window.innerHeight;
     const y=window.scrollY || window.pageYOffset || 0;
+    compactSlots = w<COMPACT_MAX ? compactHeroSlots(w,h) : null;
     const heroStart=hero.offsetTop;
     const funnelStart=funnel.offsetTop;
     const funnelHeight=funnel.offsetHeight;
@@ -1243,7 +1462,6 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
     const headOpacity=headIn*(1-headOut);
     const rowLift=ease((inFunnel-.28)/.18);
     const reveal=ease((inFunnel-.52)/.13);
-    const outputIn=ease((inFunnel-.935)/.055);
     const finishFade=1-ease((inFunnel-.985)/.018);
     const basePower=ease((inFunnel-.74)/.12);
     bridge.classList.toggle('is-finished', finishFade < .03);
@@ -1278,7 +1496,7 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
     badges.forEach(function(_,i){
       const reverseIndex = (badges.length - 1 - i);
       const isMobile = w < 760;
-      const delay=(isMobile ? reverseIndex*.040 : reverseIndex*.022);
+      const delay=dropDelay(reverseIndex, isMobile);
       const hit = isMobile
         ? (inFunnel-(.785+delay*.52))/.072
         : (inFunnel-(.80+delay*.58))/.062;
@@ -1314,7 +1532,7 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
         Slack/unten zuerst, WordPress/oben zuletzt.
       */
       const isMobile = w < 760;
-      const delay=(isMobile ? reverseIndex*.040 : reverseIndex*.022);
+      const delay=dropDelay(reverseIndex, isMobile);
       const toMouth=ease((inFunnel-(.54+delay))/.13);
       const toInside=ease((inFunnel-(.64+delay))/.15);
       const toCollect=ease((inFunnel-(.74+delay*.58))/.14);
@@ -1377,6 +1595,9 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
   window.addEventListener('scroll', scheduleUpdate, {passive:true});
   window.addEventListener('resize', scheduleUpdate, {passive:true});
   window.addEventListener('orientationchange', scheduleUpdate, {passive:true});
+  /* Mobile-Plaetze haengen an der Groesse der Hero-Headline: nach dem Laden
+     der Webfonts einmal neu messen. */
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleUpdate);
+  window.addEventListener('load', scheduleUpdate);
   scheduleUpdate();
 })();
-

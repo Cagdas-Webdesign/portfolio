@@ -1,0 +1,173 @@
+/* ============================================================
+   OBSERVABILITY DASHBOARD
+   Zwischen Under the Hood (Runtime) und dem Evaluation Report.
+   Innerhalb .rx (nutzt deren Tokens), Praefix .obs-. Ruhig: nur ein
+   einmaliges Fade + kurzer Lift, kein Zoom/Parallax/Pin.
+   ============================================================ */
+
+.obs__top {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(32px, 4.5vw, 72px);
+  align-items: center;
+}
+
+.obs__copy { min-width: 0; }
+
+/* Typografie wie die Ueberschriften der uebrigen RAG-Bloecke */
+.obs__title {
+  margin: 0;
+  color: var(--rx-ink);
+  font: 700 clamp(34px, 4vw, 60px)/1.12 var(--rx-display);
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.obs__lead {
+  max-width: 520px;
+  margin: 22px 0 0;
+  color: var(--rx-muted);
+  font: 450 17px/1.62 var(--rx-body);
+}
+
+/* Screenshot: unveraendert, nur gerahmt */
+.obs__shot {
+  position: relative;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--rx-line-2);
+  border-radius: 18px;
+  background: var(--rx-panel);
+  /* Desktop-Lichtraum in drei weichen Lagen: eng am Rahmen, mittlerer
+     Blau-/Cyan-Schein, weiter atmosphaerischer Hof. Nur box-shadow —
+     das Bild selbst bleibt ungefiltert. (Handy: eigene Regel unten.) */
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 40px 80px -40px rgba(0, 0, 0, 0.9),
+    0 0 28px -4px rgba(127, 178, 255, 0.26),
+    0 0 90px -8px rgba(96, 170, 255, 0.3),
+    0 0 200px 10px rgba(70, 150, 255, 0.14);
+}
+
+.obs__shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---------- Drei Kacheln ---------- */
+
+.obs__cards {
+  display: grid;
+  margin: clamp(48px, 5vw, 72px) 0 0;
+  padding: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  list-style: none;
+}
+
+.obs-card {
+  padding: 22px 22px 24px;
+  border: 1px solid var(--rx-line);
+  border-radius: 20px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)), var(--rx-panel);
+}
+
+.obs-card__icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(255, 122, 61, 0.26);
+  border-radius: 12px;
+  color: var(--rx-q);
+  background:
+    radial-gradient(120% 120% at 30% 0%, rgba(255, 122, 61, 0.16), transparent 70%),
+    rgba(255, 122, 61, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.obs-card__icon svg { width: 19px; height: 19px; }
+
+.obs-card__title {
+  margin: 18px 0 0;
+  color: var(--rx-ink);
+  font: 650 18px/1.25 var(--rx-display);
+  letter-spacing: -0.02em;
+}
+
+.obs-card__text {
+  margin: 8px 0 0;
+  color: var(--rx-muted);
+  font: 450 14.5px/1.6 var(--rx-body);
+}
+
+/* ---------- Einblenden (einmalig, dezent) ---------- */
+
+.obs.is-armed .obs__copy,
+.obs.is-armed .obs__shot,
+.obs.is-armed .obs-card {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  transition: opacity 700ms ease, transform 900ms var(--rx-ease);
+}
+
+.obs.is-armed .obs__shot { transition-delay: 120ms; }
+.obs.is-armed .obs-card:nth-child(1) { transition-delay: 240ms; }
+.obs.is-armed .obs-card:nth-child(2) { transition-delay: 320ms; }
+.obs.is-armed .obs-card:nth-child(3) { transition-delay: 400ms; }
+
+.obs.is-armed.is-in .obs__copy,
+.obs.is-armed.is-in .obs__shot,
+.obs.is-armed.is-in .obs-card {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1100px) {
+  .obs__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .obs-card:last-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 899px) {
+  /* Reihenfolge: Headline + Text → Screenshot → Kacheln */
+  .obs__top { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .obs__lead { margin-top: 16px; font-size: 16px; }
+
+  /* Screenshot mit mehr Buehne: fast randlos (6px zum Rand), in einer
+     feinen Glas-Fassung mit ruhigem blauem Lichtraum. Bild selbst
+     unveraendert (Seitenverhaeltnis, Inhalt). */
+  .obs__shot {
+    margin-inline: -10px;
+    padding: 4px;
+    border-radius: 18px;
+    background: linear-gradient(160deg, rgba(127, 178, 255, 0.14), rgba(127, 178, 255, 0.03) 45%, rgba(255, 255, 255, 0.04));
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.4),
+      0 30px 60px -30px rgba(0, 0, 0, 0.9),
+      0 0 22px -4px rgba(127, 178, 255, 0.32),
+      0 0 64px -6px rgba(96, 170, 255, 0.34),
+      0 0 140px 6px rgba(70, 150, 255, 0.16);
+  }
+  .obs__shot img { border-radius: 13px; }
+
+  .obs__cards { margin-top: 52px; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .obs-card:last-child { grid-column: auto; }
+
+  /* Kompakt: Icon neben dem Titel, knappes Padding */
+  .obs-card {
+    display: grid;
+    padding: 14px 16px 16px;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 12px;
+    align-items: center;
+    border-radius: 16px;
+  }
+  .obs-card__icon { width: 32px; height: 32px; border-radius: 10px; }
+  .obs-card__icon svg { width: 16px; height: 16px; }
+  .obs-card__title { margin: 0; font-size: 16.5px; }
+  .obs-card__text { grid-column: 1 / -1; margin-top: 8px; font-size: 14px; line-height: 1.55; }
+}

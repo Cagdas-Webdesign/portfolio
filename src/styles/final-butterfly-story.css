@@ -1,0 +1,576 @@
+/* ============================================================
+   FINAL BUTTERFLY STORY — FreeFrontend/Zajno "Cicada"
+   Isolierte 1:1-Portierung der Vorlage. Die Vorlage skaliert
+   alles über html{font-size: calc(10000vw/1920)} — hier statt-
+   dessen lokal über --r (1 Vorlage-rem), damit das restliche
+   Portfolio unberührt bleibt. Layer sind nicht mehr fixed,
+   sondern absolute in einer per ScrollTrigger gepinnten Stage.
+   ============================================================ */
+
+.final-butterfly-story {
+  /* 1 rem der Vorlage */
+  --r: calc(100vw / 19.2);
+
+  --main-font: "Work Sans", sans-serif;
+  --color-black: #000000;
+  --color-black-light: #181b1a;
+  --color-light-purity: #E0D8EB;
+  --color-fat-tuesday: #341F37;
+  --color-bashful-pancy: #D8CEE6;
+  --color-sugar-crystal: #F9F5FF;
+  --color-white: #ffffff;
+
+  position: relative;
+  width: 100%;
+  /* Scrollstrecke der Vorlage (main{height:10000px}) — hier section-intern */
+  height: 10000px;
+  background: var(--color-light-purity);
+  font-family: var(--main-font);
+  color: var(--color-fat-tuesday);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@media (min-aspect-ratio: 1440 / 1080) {
+  .final-butterfly-story {
+    --r: calc(100vh / 10.8);
+  }
+}
+
+.final-butterfly-story .fbs-stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  /* Blending-Isolation: soft-light darf nur mit dem Stage-Inhalt
+     blenden, nicht mit der schwarzen Seite dahinter. */
+  isolation: isolate;
+  /* Backdrop fuer die soft-light-Textur: in der Vorlage lag dieses
+     Lavendel auf dem body; ohne eigenen Stage-Hintergrund blendet
+     das gepinnte ::before sonst mit schwarzem Compositing-Backdrop. */
+  background: var(--color-light-purity);
+}
+
+/* body::before der Vorlage: Papiertextur */
+.final-butterfly-story .fbs-stage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/assets/final-butterfly/texture.png');
+  background-repeat: repeat;
+  /* Original: mix-blend-mode soft-light. Chromium rendert Blend-Modes
+     ueber gepinnten fixed-Containern mit Video-Layern gegen einen
+     schwarzen Compositor-Backdrop (ganze Stage wird schwarz) — daher
+     die Papierkoernung hier ohne Blending, visuell nahezu identisch. */
+  opacity: 0.24;
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* body::after der Vorlage: weiche Lichtfläche unten */
+.final-butterfly-story .fbs-stage::after {
+  content: '';
+  position: absolute;
+  bottom: calc(-3.76 * var(--r));
+  left: 50%;
+  width: calc(22.42 * var(--r));
+  height: calc(8.86 * var(--r));
+  /* Original: Vollflaeche + filter blur(2.5rem ~ 190px). Der Riesen-Blur
+     bringt den Compositor zusammen mit Video/SVG-Layern zum Haengen —
+     ein weicher Radial-Gradient erzeugt dieselbe Lichtflaeche ohne Filter. */
+  background: radial-gradient(50% 50% at 50% 50%, var(--color-sugar-crystal) 0%, rgba(249, 245, 255, 0.55) 42%, rgba(249, 245, 255, 0) 72%);
+  transform: translateX(-50%) scale(1.6);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---------- SplitText-Masken ---------- */
+
+.final-butterfly-story .fade-overflow {
+  display: block;
+  overflow: hidden;
+}
+
+.final-butterfly-story .fade-el {
+  display: block;
+}
+
+/* ---------- Banner ---------- */
+
+.final-butterfly-story .banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100vw;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 calc(0.4 * var(--r));
+  overflow: hidden;
+  z-index: 1;
+}
+
+.final-butterfly-story .banner-slide {
+  z-index: 2;
+}
+
+.final-butterfly-story .banner-title {
+  position: absolute;
+  top: calc(1.95 * var(--r));
+  max-width: calc(9.57 * var(--r));
+  font-size: calc(1 * var(--r));
+  line-height: 1.1;
+  letter-spacing: calc(-0.07 * var(--r));
+  text-align: center;
+  z-index: 3;
+}
+
+.final-butterfly-story .banner-title span {
+  position: relative;
+  display: inline-block;
+}
+
+.final-butterfly-story .banner-title span::before {
+  content: "";
+  position: absolute;
+  bottom: calc(-0.04 * var(--r));
+  left: 0;
+  width: 100%;
+  border-bottom: 4px solid currentColor;
+  transform: rotate(-3deg);
+}
+
+.final-butterfly-story .banner-subtitle {
+  position: absolute;
+  top: calc(2.8 * var(--r));
+  font-size: calc(1 * var(--r));
+  line-height: 1.1;
+  letter-spacing: calc(-0.07 * var(--r));
+  text-align: center;
+  opacity: 0;
+  z-index: 1;
+}
+
+.final-butterfly-story .banner-text {
+  position: absolute;
+  top: calc(1.89 * var(--r));
+  max-width: calc(6.87 * var(--r));
+  font-size: calc(0.42 * var(--r));
+  line-height: 1.1;
+  letter-spacing: calc(-0.0295 * var(--r));
+  opacity: 0;
+  z-index: 1;
+}
+
+.final-butterfly-story .banner-tree {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: calc(19 * var(--r));
+  height: auto;
+  transform: translateX(-50%);
+  transform-origin: bottom;
+  z-index: 2;
+}
+
+.final-butterfly-story .banner-tree img,
+.final-butterfly-story .banner-tree video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---------- Wings (großer SVG-Schmetterling) ---------- */
+
+.final-butterfly-story .wings {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100vw;
+  height: 100%;
+  overflow: hidden;
+  /* Hintergrundebene: liegt hinter Baum (banner, z1) und Zweig-Layer */
+  z-index: 0;
+}
+
+.final-butterfly-story .wings-svg {
+  position: absolute;
+  left: 50%;
+  bottom: calc(0.95 * var(--r));
+  width: 95vw;
+  height: auto;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+.final-butterfly-story .wings-svg svg {
+  width: 100%;
+  height: auto;
+  /* grafisch zurueckhaltend, Baum und Titel behalten die Hauptrolle */
+  opacity: 0.5;
+}
+
+/* ---------- Tree (Zweigstruktur) ---------- */
+
+.final-butterfly-story .tree {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100vw;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.final-butterfly-story .tree-name {
+  position: absolute;
+  top: calc(0.92 * var(--r));
+  left: 50%;
+  font-size: calc(0.51 * var(--r));
+  letter-spacing: calc(-0.0357 * var(--r));
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-50%);
+}
+
+.final-butterfly-story .tree-wrapp {
+  position: absolute;
+  top: calc(3.32 * var(--r));
+  left: 50%;
+  display: block;
+  width: calc(9.5 * var(--r));
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.final-butterfly-story .tree-svg {
+  display: none;
+  width: 100%;
+  height: auto;
+}
+
+.final-butterfly-story .tree-circle {
+  position: absolute;
+  top: calc(1 * var(--r));
+  left: 50%;
+  width: calc(8.62 * var(--r));
+  height: auto;
+  aspect-ratio: 1 / 1;
+  box-shadow: 0 0 0 1px var(--color-fat-tuesday);
+  border-radius: 50%;
+  transform: translateX(-50%) scale(0);
+}
+
+.final-butterfly-story .tree-circle__small {
+  box-shadow: 0 0 0 3px var(--color-fat-tuesday);
+}
+
+.final-butterfly-story .tree-title {
+  position: absolute;
+  max-width: calc(2 * var(--r));
+  font-size: calc(0.2 * var(--r));
+  font-weight: 400;
+  letter-spacing: calc(-0.009 * var(--r));
+  padding: calc(0.18 * var(--r));
+  cursor: pointer;
+  z-index: 2;
+}
+
+.final-butterfly-story .tree-title span {
+  display: inline-block;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+.final-butterfly-story .tree-title_top {
+  top: calc(-0.25 * var(--r));
+  left: 50%;
+  transform: translate(-50%, -100%);
+  transform-origin: bottom center;
+}
+
+.final-butterfly-story .tree-title_left-top {
+  top: calc(0.6 * var(--r));
+  right: calc(7.65 * var(--r));
+  transform: translateY(-50%);
+  transform-origin: bottom right;
+}
+
+.final-butterfly-story .tree-title_left {
+  top: calc(2.13 * var(--r));
+  left: calc(-0.1 * var(--r));
+  transform: translate(-100%, 0%);
+  transform-origin: bottom right;
+}
+
+.final-butterfly-story .tree-title_right-top {
+  top: calc(0.6 * var(--r));
+  left: calc(7.65 * var(--r));
+  transform: translateY(-50%);
+  transform-origin: bottom left;
+}
+
+.final-butterfly-story .tree-title_right {
+  top: calc(2.13 * var(--r));
+  right: calc(-0.1 * var(--r));
+  transform: translate(100%, 0%);
+  transform-origin: bottom left;
+}
+
+.final-butterfly-story .tree-title__decor {
+  position: absolute;
+  top: 50%;
+  width: calc(0.08 * var(--r));
+  height: auto;
+  transform: translateY(-50%);
+  opacity: 0;
+}
+
+.final-butterfly-story .tree-title__decor.left {
+  left: calc(0.06 * var(--r));
+}
+
+.final-butterfly-story .tree-title__decor.right {
+  right: calc(0.06 * var(--r));
+}
+
+.final-butterfly-story .tree-ball {
+  position: absolute;
+  width: calc(0.14 * var(--r));
+  height: calc(0.14 * var(--r));
+  aspect-ratio: 1 / 1;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.final-butterfly-story .tree-ball_top {
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -100%);
+}
+
+.final-butterfly-story .tree-ball_left-top {
+  top: calc(0.6 * var(--r));
+  right: calc(7.39 * var(--r));
+  transform: translate(0%, -50%);
+}
+
+.final-butterfly-story .tree-ball_left {
+  top: calc(2.5 * var(--r));
+  left: 0;
+  transform: translate(-50%, -100%);
+}
+
+.final-butterfly-story .tree-ball_right-top {
+  top: calc(0.6 * var(--r));
+  left: calc(7.39 * var(--r));
+  transform: translate(0%, -50%);
+}
+
+.final-butterfly-story .tree-ball_right {
+  top: calc(2.5 * var(--r));
+  right: 0;
+  transform: translate(50%, -100%);
+}
+
+.final-butterfly-story .tree-ball span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--color-fat-tuesday);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ---------- Schmetterling (PNG-Flügel) ---------- */
+
+.final-butterfly-story .tree-wings {
+  position: absolute;
+  bottom: calc(-1.22 * var(--r));
+  left: 50%;
+  width: calc(15.15 * var(--r));
+  height: calc(5.04 * var(--r));
+  max-height: 100vh;
+  transform: translateX(-50%);
+  opacity: 0;
+  z-index: 1;
+}
+
+.final-butterfly-story .tree-wings__item {
+  position: absolute;
+}
+
+.final-butterfly-story .tree-wings__item img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+.final-butterfly-story .tree-wings__center {
+  position: absolute;
+  top: calc(1.28 * var(--r));
+  left: 50%;
+  width: calc(1.34 * var(--r));
+  transform: translateX(-50%);
+}
+
+.final-butterfly-story .tree-wings__top-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(7.05 * var(--r));
+  transform-origin: center right;
+}
+
+.final-butterfly-story .tree-wings__top-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: calc(7.05 * var(--r));
+  transform-origin: center left;
+}
+
+.final-butterfly-story .tree-wings__bottom-left {
+  position: absolute;
+  top: calc(2.586 * var(--r));
+  left: calc(3.496 * var(--r));
+  width: calc(3.9 * var(--r));
+  transform-origin: top right;
+}
+
+.final-butterfly-story .tree-wings__bottom-right {
+  position: absolute;
+  top: calc(2.586 * var(--r));
+  right: calc(3.496 * var(--r));
+  width: calc(3.9 * var(--r));
+  transform-origin: top left;
+}
+
+/* ---------- Zentrales Branding (ersetzt "Ci" im Original-Asset) ---------- */
+
+.final-butterfly-story .fbs-brand {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: calc(1.02 * var(--r));
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  background: var(--color-fat-tuesday);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 calc(0.018 * var(--r)) rgba(249, 245, 255, 0.4),
+    0 calc(0.04 * var(--r)) calc(0.12 * var(--r)) rgba(52, 31, 55, 0.35);
+}
+
+.final-butterfly-story .fbs-brand b {
+  font-family: var(--font-display), var(--main-font);
+  font-size: calc(0.3 * var(--r));
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--cyan, #00ffe7), var(--blue, #4aa3ff), var(--violet, #7b61ff));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---------- Mobile: dieselbe Story in Hochformat ---------- */
+
+@media (max-width: 700px) {
+  .final-butterfly-story {
+    /* Gleiche Scrollstrecke und damit dieselbe Timeline-Dramaturgie. */
+    height: 10000px;
+  }
+
+  .final-butterfly-story .banner-title {
+    top: 15svh;
+    max-width: 94vw;
+    font-size: clamp(27px, 8vw, 34px);
+    letter-spacing: -0.045em;
+  }
+
+  .final-butterfly-story .banner-subtitle {
+    top: 15svh;
+    max-width: 94vw;
+    font-size: clamp(24px, 6.2vw, 30px);
+    letter-spacing: -0.04em;
+  }
+
+  .final-butterfly-story .banner-text {
+    top: 16.5svh;
+    max-width: 88vw;
+    font-size: clamp(15px, 4.4vw, 18px);
+    letter-spacing: -0.01em;
+  }
+
+  /* Der breite Alpha-Film wird um die Krone zentriert. Beim identischen
+     Timeline-Zoom bleibt dadurch das Blütenzentrum im Hochformat sichtbar. */
+  .final-butterfly-story .banner-tree {
+    bottom: 20svh;
+    width: 200vw;
+    max-width: none;
+  }
+
+  .final-butterfly-story .wings-svg {
+    bottom: 12svh;
+    width: 112vw;
+  }
+
+  .final-butterfly-story .tree-name {
+    top: 14svh;
+    font-size: clamp(19px, 5.6vw, 24px);
+    letter-spacing: -0.02em;
+  }
+
+  /* Die Desktop-Geometrie bleibt vollständig erhalten. Ein lokaler
+     Maßstab passt Linien, Kreise, Punkte und Flügel gemeinsam ein. */
+  .final-butterfly-story .tree-wrapp {
+    --r: min(calc((100vw - 20px) / 15.15), 28px);
+
+    top: 34svh;
+    width: calc(9.5 * var(--r));
+    height: auto;
+    max-width: none;
+    transform: translateX(-50%);
+  }
+
+  .final-butterfly-story .tree-title {
+    max-width: calc(3.4 * var(--r));
+    padding: 4px 5px;
+    font-size: clamp(10px, 2.8vw, 12px);
+    text-align: center;
+  }
+}
+
+/* ---------- prefers-reduced-motion: statische Version ---------- */
+
+.final-butterfly-story.fbs-reduced {
+  height: auto;
+}
+
+.final-butterfly-story.fbs-reduced .fbs-stage {
+  height: 100vh;
+  height: 100svh;
+}
+
+.final-butterfly-story.fbs-reduced .banner-subtitle,
+.final-butterfly-story.fbs-reduced .banner-text,
+.final-butterfly-story.fbs-reduced .tree {
+  display: none;
+}

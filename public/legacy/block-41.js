@@ -13,21 +13,6 @@
     }
   }
 
-  function keepHeroWPlain(){
-    var text = document.querySelector('#heroType .hero-w-text');
-    var crown = document.querySelector('#heroType .hero-w-crown');
-    if(text){
-      text.style.visibility = 'visible';
-      text.style.opacity = '1';
-      text.style.transform = 'none';
-    }
-    if(crown){
-      crown.style.display = 'none';
-      crown.style.visibility = 'hidden';
-      crown.style.opacity = '0';
-    }
-  }
-
   function cleanVisibleText(){
     var root = document.body;
     if(!root) return;
@@ -36,6 +21,8 @@
         if(!node || !node.parentNode) return NodeFilter.FILTER_REJECT;
         var tag = node.parentNode.nodeName;
         if(/^(SCRIPT|STYLE|NOSCRIPT|TITLE)$/.test(tag)) return NodeFilter.FILTER_REJECT;
+        /* Woertlich zu haltende Teilbaeume (z. B. E-Mail-Adressen) ausnehmen. */
+        if(node.parentElement && node.parentElement.closest('[data-keep-text]')) return NodeFilter.FILTER_REJECT;
         if(node.nodeValue.trim() === '') return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
@@ -68,7 +55,6 @@
   }
 
   function runV58Fixes(){
-    keepHeroWPlain();
     centerFlowCircleLabel();
     cleanVisibleText();
     refreshTriggers();
@@ -89,7 +75,6 @@
   window.addEventListener('resize', function(){
     clearTimeout(window.__v58Resize);
     window.__v58Resize = setTimeout(function(){
-      keepHeroWPlain();
       centerFlowCircleLabel();
       refreshTriggers();
     }, 160);

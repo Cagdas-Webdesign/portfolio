@@ -1,44 +1,56 @@
-# Portfolio Çağdaş — React Migration (Phase 1)
+# Portfolio Çağdaş Uçar
 
-1:1 migration of the original single-file portfolio (`../index (6).html`) into
-Vite + React. **No redesign** — markup, CSS cascade and animation behavior are
-kept identical to the source.
+Persönliches Portfolio als Single-Page-App mit React 19 und Vite 8, inklusive
+Portfolio Assistant (Anbindung an das eigene RAG-Backend
+[portfolio-rag-backend](https://github.com/Cagdas-Webdesign/portfolio-rag-backend)).
 
-## Run
+## Entwicklung
+
+Node.js `^20.19.0 || >=22.12.0` (siehe `.nvmrc`).
 
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm run build
+npm run lint     # oxlint
+npm test         # node:test
+npm run build    # Ausgabe in dist/
 ```
 
-## Structure
+## Konfiguration
 
-- `src/components/` — the original body markup split into React components
-  (Hero, Funnel, CodeSection, Experience, NestedOffers, AiAssistant,
-  Certificate, SocialLottie, ReelsShowcase, SystemStory, Automation,
-  ContentEngine, Contact, Footer, Nav, Cursor, AiAssistantWidget), rendered
-  in the original document order by `App.jsx`.
-- `src/styles/base.css` — all `<style>` blocks that lived in the original
-  `<head>`, in document order.
-- `src/styles/patches.css` — all versioned `<style>` patch blocks that
-  followed the markup, in document order. **Import order matters** — it
-  reproduces the original cascade (see `src/main.jsx`).
-- `public/legacy/block-NN.js` — the 45 original inline `<script>` blocks,
-  untouched. `src/legacy/loadLegacyScripts.js` loads them sequentially as
-  classic scripts after React mounts (same shared-global-scope semantics as
-  the original page) and replays `DOMContentLoaded`/`load` for late listeners.
-- `public/videos/` — the four marketing reels (`instagram`, `tiktok`,
-  `linkedin`, `whatsapp`), converted from the `.mov` screen recordings.
-- `scripts/extract.mjs` — the one-time extractor that generated components,
-  styles and legacy blocks from the source file. Re-running it overwrites the
-  generated files (manual follow-up edits: Footer split out of Contact, video
-  paths rewritten to `/videos/`).
+| Wo | Was |
+| --- | --- |
+| `src/siteConfig.js` | Kontakt-E-Mail, GitHub-Profil, Repository-URLs (Portfolio und RAG-Backend) |
+| `.env.local` (nicht im Repo) | `VITE_RAG_API_URL` (Cloudflare-Worker-Endpoint) und `VITE_TURNSTILE_SITE_KEY` — Vorlage: `.env.example` |
 
-GSAP + ScrollTrigger come from npm and are exposed as `window.gsap` /
-`window.ScrollTrigger` for the legacy scripts (`src/main.jsx`).
+Die `VITE_*`-Werte landen im Browser-Bundle und sind öffentlich; dort gehören
+keine Secrets hinein. Sie müssen beim **Build** gesetzt sein — sonst ist der
+Portfolio Assistant im Build nicht verbunden.
 
-## Phase 2 (not started — pending approval)
+## Deployment (GitHub Pages)
 
-Componentize the legacy patch CSS/JS properly, move animations into React
-(Framer Motion), deduplicate the versioned patch layers.
+`vite.config.js` nutzt `base: './'`: Der Build funktioniert unter jedem Pfad
+(`https://<user>.github.io/<repo>/`), ohne den Repository-Namen zu kennen.
+Dateien aus `public/` werden im Code immer über `import.meta.env.BASE_URL`
+referenziert, nie mit führendem `/`. `public/.nojekyll` verhindert die
+Jekyll-Verarbeitung durch GitHub Pages.
+
+Workflow: `.github/workflows/deploy-pages.yml` — wird nur manuell gestartet
+(Actions → „Deploy to GitHub Pages“ → Run workflow). Vorher einmalig
+`VITE_RAG_API_URL` und `VITE_TURNSTILE_SITE_KEY` als Repository-*Variables*
+anlegen und unter Settings → Pages als Source „GitHub Actions“ wählen.
+Live-URL: https://cagdas-webdesign.github.io/portfolio/
+
+## Aufbau
+
+- `src/components/` — Sections, Pop-ups, Assistant, Footer, Impressum/Datenschutz
+- `src/styles/` — Stylesheets; `base.css`/`patches.css` sind die historisch
+  gewachsenen Grundschichten (Import-Reihenfolge in `src/main.jsx` beachten)
+- `public/legacy/block-NN.js` — ältere Skripte, die `src/legacy/loadLegacyScripts.js`
+  nach Index lädt. Leere Blöcke bleiben als Datei bestehen, weil die
+  Ladereihenfolge am Index hängt.
+- `src/services/githubRelease.js` — neuester GitHub-Release über die öffentliche
+  API (ohne Token, nur In-Memory-Cache)
+
+GSAP und ScrollTrigger kommen aus npm und werden für die Legacy-Skripte als
+`window.gsap` / `window.ScrollTrigger` bereitgestellt (`src/main.jsx`).

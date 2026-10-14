@@ -1,46 +1,48 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { loadLegacyScripts } from './legacy/loadLegacyScripts.js';
 
-import Cursor from './components/Cursor.jsx';
 import Nav from './components/Nav.jsx';
 import Hero from './components/Hero.jsx';
 import Funnel from './components/Funnel.jsx';
 import CodeSection from './components/CodeSection.jsx';
-import Experience from './components/Experience.jsx';
 import NestedOffers from './components/NestedOffers.jsx';
-import AiAssistant from './components/AiAssistant.jsx';
+import AiPortfolioExperience from './components/ai-experience/AiPortfolioExperience.jsx';
 import Certificate from './components/Certificate.jsx';
-import SocialLottie from './components/SocialLottie.jsx';
-import ReelsShowcase from './components/ReelsShowcase.jsx';
-import SystemStory from './components/SystemStory.jsx';
 import Automation from './components/Automation.jsx';
-import ContentEngine from './components/ContentEngine.jsx';
-import Contact from './components/Contact.jsx';
+import FinalButterflyStory from './components/FinalButterflyStory.jsx';
+import Footer from './components/Footer.jsx';
+import BackToTop from './components/BackToTop.jsx';
 import AiAssistantWidget from './components/AiAssistantWidget.jsx';
 
 export default function App() {
+  const [assistantPresence, setAssistantPresence] = useState({ visible: false });
+
   useEffect(() => {
     loadLegacyScripts();
   }, []);
 
+  const handleAssistantPresence = useCallback((key, value) => {
+    setAssistantPresence((current) => (
+      current[key] === value ? current : { ...current, [key]: value }
+    ));
+  }, []);
+
   return (
     <>
-      <Cursor />
       <Nav />
       <Hero />
       <Funnel />
       <CodeSection />
-      <Experience />
       <NestedOffers />
-      <AiAssistant />
+      <AiPortfolioExperience onPresenceChange={handleAssistantPresence} />
       <Certificate />
-      <SocialLottie />
-      <ReelsShowcase />
-      <SystemStory />
       <Automation />
-      <ContentEngine />
-      <Contact />
-      <AiAssistantWidget />
+      <FinalButterflyStory />
+      <Footer />
+      <BackToTop />
+      <AiAssistantWidget
+        sectionVisible={assistantPresence.visible}
+      />
     </>
   );
 }
