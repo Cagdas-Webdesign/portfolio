@@ -1,6 +1,11 @@
 /* legacy inline script #40 id="v55-platform-flow-refresh" */
 
 (function(){
+  /* Performance (2026-10-15): Gehoert zur entfernten Plattform-Section
+     (#social-lottie / #platform-row-prelude). Ohne sie loeste dieser Block nur
+     noch komplette ScrollTrigger-Refreshes aus — beim Laden und bei jedem
+     resize (iOS: Adressleiste beim Scrollen). */
+  if(!document.getElementById('social-lottie') && !document.getElementById('platform-row-prelude')) return;
   function v55Refresh(){
     if(!window.ScrollTrigger) return;
     clearTimeout(window.__v55RefreshA);

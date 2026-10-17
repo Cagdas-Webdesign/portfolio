@@ -92,6 +92,22 @@ export default function RagTechStack() {
     if (!root) return undefined;
     let anchors = [];
     let bottom = 0;
+    /*
+     * iOS (2026-10-15): innerHeight springt beim Scroll-Richtungswechsel
+     * (Adressleiste). Die Fokuslinie haengt daran — der orange aktive
+     * Schritt flackerte genau dann um. Touch-Geraete nehmen eine neue Hoehe
+     * nur bei Breitenwechsel; Maus-Geraete (Desktop) lesen unveraendert live.
+     */
+    const touchViewport = window.matchMedia?.('(hover: none) and (pointer: coarse)').matches ?? false;
+    let stableW = window.innerWidth;
+    let stableH = window.innerHeight;
+    const viewportHeight = () => {
+      if (!touchViewport || window.innerWidth !== stableW) {
+        stableW = window.innerWidth;
+        stableH = window.innerHeight;
+      }
+      return stableH;
+    };
 
     // Anker in Seitenkoordinaten. Handy: jede Kachel liegt einzeln im Fluss.
     // Desktop: die Core-Reihe liegt nebeneinander — ihre Hoehe wird in vier
@@ -113,11 +129,11 @@ export default function RagTechStack() {
       }
       anchors = order.map((id) => byId[id]);
       // Der letzte Schritt (Runtime) bleibt noch kurz nach dem Ende aktiv.
-      bottom = root.getBoundingClientRect().bottom + y + window.innerHeight * 0.2;
+      bottom = root.getBoundingClientRect().bottom + y + viewportHeight() * 0.2;
     };
 
     const update = () => {
-      const line = window.scrollY + window.innerHeight * FOCUS_LINE;
+      const line = window.scrollY + viewportHeight() * FOCUS_LINE;
       let index = -1;
       anchors.forEach((anchor, i) => { if (line >= anchor) index = i; });
       const order = isMobile ? TRACE_MOBILE : TRACE;

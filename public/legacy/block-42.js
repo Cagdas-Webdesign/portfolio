@@ -1,6 +1,11 @@
 /* legacy inline script #42 id="v59-platform-flow-spacing-center-script" */
 
 (function(){
+  /* Performance (2026-10-15): Gehoert zur entfernten Plattform-Section
+     (#social-lottie / #platform-row-prelude). Ohne sie loeste dieser Block nur
+     noch komplette ScrollTrigger-Refreshes aus — beim Laden und bei jedem
+     resize (iOS: Adressleiste beim Scrollen). */
+  if(!document.getElementById('social-lottie') && !document.getElementById('platform-row-prelude')) return;
   if(window.__v59PlatformFlowFix) return;
   window.__v59PlatformFlowFix = true;
 

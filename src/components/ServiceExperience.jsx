@@ -116,6 +116,32 @@ export default function ServiceExperience({
     ? { duration: 0.01 }
     : { duration: 0.7, ease: [0.22, 1, 0.36, 1] };
 
+  /*
+   * Performance (2026-10-15): Die Einfahrt (translateY 102% -> 0, 0.7 s,
+   * gleiche Kurve) laeuft als WAAPI-Animation auf dem Compositor. Framer
+   * Motion animiert `y` per JavaScript in jedem Frame — waehrend das Pop-up
+   * beim Oeffnen seine Szenen aufbaut, ruckelte die Fahrt dadurch auf dem
+   * iPhone. Framer haelt `y` nur noch fuer das Ziehen zum Schliessen (Start 0).
+   */
+  const entranceRef = useRef(null);
+  useLayoutEffect(() => {
+    const experience = experienceRef.current;
+    if (reducedMotion || !experience?.animate) return undefined;
+    const entrance = experience.animate(
+      [{ transform: 'translateY(102%)' }, { transform: 'translateY(0%)' }],
+      { duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+    );
+    entranceRef.current = entrance;
+    return () => entrance.cancel();
+    // Nur beim Einhaengen — wie zuvor Framers initial -> animate
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const startDrag = (event) => {
+    entranceRef.current?.finish();
+    dragControls.start(event);
+  };
+
   const handleDragEnd = (_, info) => {
     if (info.offset.y > 120 || info.velocity.y > 700) close();
   };
@@ -192,7 +218,7 @@ export default function ServiceExperience({
       // Die sichtbare Ausfahrt uebernimmt ein statischer Schnappschuss
       // (NestedOffers.closeExperience) — das lebende Pop-up verschwindet sofort.
       exit={{ opacity: 0, transition: { duration: 0 } }}
-      initial={{ opacity: reducedMotion ? 0 : 0.99, y: '102%' }}
+      initial={{ opacity: reducedMotion ? 0 : 0.99, y: reducedMotion ? '102%' : 0 }}
       onDragEnd={handleDragEnd}
       ref={experienceRef}
       role="dialog"
@@ -203,7 +229,7 @@ export default function ServiceExperience({
         aria-label="Leistungsansicht nach unten schließen"
         className="sc-experience__drag-handle"
         onClick={close}
-        onPointerDown={(event) => dragControls.start(event)}
+        onPointerDown={startDrag}
         type="button"
       >
         <span />

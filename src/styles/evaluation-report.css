@@ -525,6 +525,12 @@ html.ev-modal-open .tool-bridge-layer {
   letter-spacing: 0.03em;
 }
 
+/* Noch nicht abschliessend verifiziert: dieselbe Plakette, neutral statt Gruen */
+.ev-finding__fixed.is-unverified {
+  border-color: var(--ev-line);
+  color: rgba(255, 255, 255, 0.66);
+}
+
 /* Bereits behoben: schwarzer Container, Zahl im Akzent */
 .ev-finding.is-fixed .ev-finding__num {
   border-color: rgba(111, 211, 160, 0.4);

@@ -6,9 +6,10 @@
 
   function refreshTriggers(){
     if(window.ScrollTrigger){
-      clearTimeout(window.__v58StA);
+      /* Performance (2026-10-15): nur noch der spaete Refresh (420 ms) —
+         der fruehe nach 90 ms war ein Zwischenzustand, den der spaete
+         ohnehin ueberschreibt (je Refresh mehrere 100 ms auf dem iPhone). */
       clearTimeout(window.__v58StB);
-      window.__v58StA = setTimeout(function(){ window.ScrollTrigger.refresh(); }, 90);
       window.__v58StB = setTimeout(function(){ window.ScrollTrigger.refresh(); }, 420);
     }
   }
@@ -29,6 +30,7 @@
     });
 
     var nodes = [];
+    var changed = false;
     while(walker.nextNode()) nodes.push(walker.currentNode);
     nodes.forEach(function(node){
       var val = node.nodeValue;
@@ -36,7 +38,7 @@
         .replace(/\s*[–—]+\s*/g, ' ')
         .replace(/([A-Za-zÄÖÜäöüß0-9])\s*-\s*([A-Za-zÄÖÜäöüß0-9])/g, '$1 $2')
         .replace(/\s{2,}/g, ' ');
-      if(next !== val) node.nodeValue = next;
+      if(next !== val){ node.nodeValue = next; changed = true; }
     });
 
     if(document.title){
@@ -46,6 +48,7 @@
         .replace(/\s{2,}/g, ' ')
         .trim();
     }
+    return changed;
   }
 
   function centerFlowCircleLabel(){
@@ -54,10 +57,13 @@
     });
   }
 
+  /* Performance (2026-10-15): Refresh nur, wenn sich Text tatsaechlich
+     geaendert hat (Umbrueche koennen Hoehen verschieben). Vorher 2 komplette
+     Refreshes pro Lauf (Start, load, +450 ms, +1400 ms), je 430-510 ms
+     Haupt-Thread im Mac-Emulator, meist ohne jede Aenderung. */
   function runV58Fixes(){
     centerFlowCircleLabel();
-    cleanVisibleText();
-    refreshTriggers();
+    if(cleanVisibleText()) refreshTriggers();
   }
 
   if(document.readyState === 'loading'){
@@ -72,7 +78,14 @@
     setTimeout(runV58Fixes, 1400);
   }, {once:true});
 
+  /* Nur bei Breitenaenderung: iOS meldet beim Scrollen resize, wenn die
+     Adressleiste ein-/ausfaehrt (nur die Hoehe aendert sich). Ein Refresh
+     dann mitten in der Scrollbewegung ruckelt und setzt Szenen neu auf.
+     ScrollTrigger behandelt solche Mobile-Resizes selbst. */
+  var lastWidth = window.innerWidth;
   window.addEventListener('resize', function(){
+    if(window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
     clearTimeout(window.__v58Resize);
     window.__v58Resize = setTimeout(function(){
       centerFlowCircleLabel();

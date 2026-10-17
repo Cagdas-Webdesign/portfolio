@@ -19,32 +19,23 @@ const REPORT_JSON = 'final-acceptance-v1.2.0.json';
 const REPORT_MD = 'final-acceptance-v1.2.0.md';
 const REPORT_VERSION = '1.2.0';
 
+// Oeffentlich gezeigt werden bewusst nur zwei Findings, fortlaufend
+// nummeriert (01, 02). Im Report sind es die Findings 02 und 05.
 const FINDINGS = [
   {
-    id: 'knowledge-gap',
-    title: 'Knowledge gap on serverless / edge-backend wording',
-    text: 'One question could not be answered because the knowledge base did not explicitly state that server-side logic can run without renting a traditional server.',
-  },
-  {
     id: 'grounding-refusal',
-    title: 'One conservative grounding refusal',
-    text: 'In one case, relevant evidence was retrieved correctly, but the grounding layer still rejected the generated answer as insufficiently supported.',
-  },
-  {
-    id: 'retrieval-ranking',
-    title: 'Retrieval ranking on broad or paraphrased questions',
-    text: 'Some relevant sources were retrieved, but ranked outside the strongest top results. This mainly affected broad and indirectly phrased questions.',
-  },
-  {
-    id: 'answer-precision',
-    title: 'Minor answer precision limitations',
-    text: 'In a small number of cases, the answer was correct but less precise or complete than the available knowledge allowed.',
+    num: '01',
+    title: 'Conservative grounding refusal',
+    text: 'An occasional conservative grounding refusal was observed in earlier evaluations. The system prioritizes evidence-backed answers, and this behavior has not been conclusively re-evaluated in the current release candidate.',
+    status: 'Unverified',
   },
   {
     id: 'citation-labels',
+    num: '02',
     title: 'Presentation-layer citation labels',
-    text: 'Internal source labels could appear in user-visible answers. This was identified as a presentation issue and has since been fixed in v1.2.1.',
-    fixed: 'Fixed in v1.2.1',
+    text: 'Internal source labels are removed before answers are displayed and replaced with numbered, backend-verified citations. The correction is covered by regression tests.',
+    status: 'Fixed',
+    fixed: true,
   },
 ];
 
@@ -298,7 +289,7 @@ function FindingsModal({ onExited, onRequestClose, phase, returnFocusRef }) {
         <header className="ev-modal__head">
           <div>
             <span className="ev-modal__label">Quality Findings</span>
-            <h3 className="ev-modal__title" id="ev-modal-title">Areas for Improvement</h3>
+            <h3 className="ev-modal__title" id="ev-modal-title">Quality &amp; Improvements</h3>
           </div>
           <button aria-label="Schließen" className="ev-modal__close" onClick={onRequestClose} type="button">
             <IconClose />
@@ -318,13 +309,13 @@ function FindingsModal({ onExited, onRequestClose, phase, returnFocusRef }) {
           </p>
 
           <ol className="ev-findings">
-            {FINDINGS.map((finding, index) => (
+            {FINDINGS.map((finding) => (
               <li className={`ev-finding${finding.fixed ? ' is-fixed' : ''}`} key={finding.id}>
-                <span aria-hidden="true" className="ev-finding__num">{String(index + 1).padStart(2, '0')}</span>
+                <span aria-hidden="true" className="ev-finding__num">{finding.num}</span>
                 <div className="ev-finding__body">
                   <strong>{finding.title}</strong>
                   <p>{finding.text}</p>
-                  {finding.fixed ? <span className="ev-finding__fixed">{finding.fixed}</span> : null}
+                  <span className={`ev-finding__fixed${finding.fixed ? '' : ' is-unverified'}`}>{finding.status}</span>
                 </div>
               </li>
             ))}

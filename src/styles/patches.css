@@ -3538,9 +3538,16 @@ section:has(.code-title){
   .ai-prompt-page{display:contents!important;min-width:0!important;padding:0!important}
   .ai-prompt-page .ai-chat-suggestion{width:auto!important;min-width:max-content!important;min-height:38px!important;white-space:nowrap!important;scroll-snap-align:start!important;padding:10px 12px!important;border-radius:999px!important;font-size:10.9px!important;justify-content:center!important;text-align:left!important}
   .ai-prompt-pagination{display:none!important}
+  /* Erste/letzte Kachel ganz sichtbar: Snap-Punkte respektieren das Padding,
+     und der Randverlauf ist schmaler als das Padding. */
+  .ai-prompt-track{scroll-padding-inline:14px;mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%)}
+  /* Platz fuer den Auswahlrahmen: Die Spur schneidet vertikal ab (overflow-x
+     auto), und die getippte Kachel hebt sich per :hover um 1px an. 4px Luft
+     oben/unten, per negativem Rand ausgeglichen — die Hoehe bleibt gleich. */
+  .ai-prompt-track{padding-top:4px!important;padding-bottom:4px!important;margin-top:-4px;margin-bottom:-4px}
 }
 @media(max-width:420px){
-  .ai-prompt-track{padding-left:13px!important;padding-right:13px!important}
+  .ai-prompt-track{padding-left:13px!important;padding-right:13px!important;scroll-padding-inline:13px}
   .ai-prompt-page .ai-chat-suggestion{font-size:10.65px!important;padding:10px 11px!important}
 }
 

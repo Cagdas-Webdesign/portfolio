@@ -288,7 +288,7 @@ export default function AiAssistantWidget({ sectionVisible }) {
                 <button className="ai-chat-suggestion" onClick={handleSuggestion} type="button">✨ Was kann Çağdaş?</button>
                 <button className="ai-chat-suggestion" onClick={handleSuggestion} type="button">🔌 Wie bindet er APIs an?</button>
                 <button className="ai-chat-suggestion" onClick={handleSuggestion} type="button">🤖 Welche Technologie steckt hinter diesem Chatbot?</button>
-                <button className="ai-chat-suggestion" onClick={handleSuggestion} type="button">🌐 Welche Technologie steckt hinter dieser Website?</button>
+                <button className="ai-chat-suggestion" onClick={handleSuggestion} type="button">🌐 Welche Technologie steckt hinter diesem Portfolio?</button>
                 <button className="ai-chat-suggestion" onClick={handleSuggestion} type="button">🛒 Kann er Online-Shops umsetzen?</button>
                 <button className="ai-chat-suggestion" onClick={handleSuggestion} type="button">📱 Was kann er mit Social Media?</button>
               </div>

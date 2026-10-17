@@ -20,26 +20,35 @@
       }catch{}
     }
 
-    /* Browser/Live-Server-Mobile-Preview braucht manchmal ein Layout-Signal */
-    try{
-      window.dispatchEvent(new Event('resize'));
-    }catch{}
+    /* Performance (2026-10-14): Hier stand ein kuenstliches
+       window.dispatchEvent(new Event('resize')). Zusammen mit dem
+       resize-Listener unten ergab das eine Endlosschleife (jeder Aufruf
+       loest den naechsten aus): gemessen ~136 resize-Events/s im Leerlauf,
+       nur auf Handybreite (<=900px) — jede Runde mit Refresh und allen
+       resize-Handlern der Seite. Entfernt. */
 
     try{
       document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
     }catch{}
   }
 
+  /* Performance (2026-10-15): Frueher 7 Refreshes pro Anlass (sofort, rAF,
+     80/220/520/950/1500 ms) — bei Start, load und fonts.ready also bis zu 21
+     komplette ScrollTrigger.refresh(true) in den ersten Sekunden, genau
+     waehrend man durch Hero und Funnel scrollt (gemessen: 11 Refreshes in
+     ~3 s, je 45-645 ms Haupt-Thread im Mac-Emulator). Jetzt ein einziger,
+     entprellter Refresh 1500 ms nach dem letzten Anlass — derselbe Zeitpunkt
+     wie der bisherige letzte Refresh, also derselbe Endzustand. */
+  let refreshTimer = 0;
   function scheduleRefreshes(){
-    if(!isMobile()) return;
-    refreshMobileGsap();
-    requestAnimationFrame(refreshMobileGsap);
-    setTimeout(refreshMobileGsap, 80);
-    setTimeout(refreshMobileGsap, 220);
-    setTimeout(refreshMobileGsap, 520);
-    setTimeout(refreshMobileGsap, 950);
-    setTimeout(refreshMobileGsap, 1500);
+    if(!isMobile()) return false;
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(refreshMobileGsap, 1500);
+    return true;
   }
+  /* Der Legacy-Loader legt seinen spaeten Refresh hier hinein (ein Timer
+     statt zwei Refreshes kurz hintereinander, 2026-10-15). */
+  window.__scheduleMobileStRefresh = scheduleRefreshes;
 
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', scheduleRefreshes, {once:true});
@@ -49,7 +58,11 @@
 
   window.addEventListener('load', scheduleRefreshes, {once:true});
   window.addEventListener('orientationchange', ()=>setTimeout(scheduleRefreshes, 220), {passive:true});
-  window.addEventListener('resize', ()=>setTimeout(refreshMobileGsap, 120), {passive:true});
+  /* Kein Refresh mehr auf jedes resize: iOS Safari meldet resize beim
+     Ein-/Ausblenden der Adressleiste WAEHREND des Scrollens. Ein
+     ScrollTrigger.refresh(true) mitten im Scrollen erzeugt Ruckler und
+     Spruenge; echte Groessenwechsel behandelt ScrollTrigger selbst
+     (ignoreMobileResize), Drehen deckt orientationchange oben ab. */
 
   if(document.fonts && document.fonts.ready){
     document.fonts.ready.then(scheduleRefreshes).catch(()=>{});

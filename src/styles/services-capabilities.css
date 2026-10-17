@@ -2601,6 +2601,39 @@ html.services-experience-active #funnelBadgeLayer {
   }
 }
 
+/* Aktive Leistungskarte (Desktop und Touch, ohne Hover): durchgehender
+   orangefarbener Rahmen mit weichem Schein — staerker als der Hover-Rahmen.
+   Nutzt den bestehenden Active-State (.is-active) und die vorhandenen
+   Uebergaenge (border-color/box-shadow). Die Spur schneidet vertikal ab
+   (overflow-y: hidden): oben 14px mehr Luft fuer den Schein, per negativem
+   Rand ausgeglichen — Karten und Abstaende bleiben, wo sie sind. */
+#services-capabilities .sc-viewport {
+  padding-top: 24px;
+  margin-top: -14px;
+}
+
+#services-capabilities .sc-card.is-active,
+#services-capabilities .sc-card.is-active:hover {
+  border-color: color-mix(in srgb, var(--sc-orange) 62%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--sc-orange) 22%, transparent),
+    0 0 28px -6px color-mix(in srgb, var(--sc-orange) 42%, transparent),
+    0 38px 100px rgba(0, 0, 0, 0.36);
+}
+
+@media (max-width: 899px) {
+  #services-capabilities .sc-viewport {
+    padding-top: 18px;
+  }
+
+  #services-capabilities .sc-card.is-active {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--sc-orange) 22%, transparent),
+      0 0 28px -6px color-mix(in srgb, var(--sc-orange) 42%, transparent),
+      0 22px 58px rgba(0, 0, 0, 0.28);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #services-capabilities .sc-card,
   #services-capabilities .sc-card__link,

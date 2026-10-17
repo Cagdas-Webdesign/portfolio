@@ -1,5 +1,9 @@
 /* legacy inline script #0 id="anon" */
 
+/* Performance: Trigger, die es vor diesem Block schon gab (React-Komponenten),
+   bleiben unangetastet — siehe Aufraeumen vor V34. */
+window.__legacyStBefore = window.ScrollTrigger ? window.ScrollTrigger.getAll().slice() : [];
+
 gsap.registerPlugin(ScrollTrigger);
 
 /* Hero: neu gebaut in src/components/Hero.jsx mit eigener GSAP-Timeline.
@@ -23,7 +27,13 @@ gsap.registerPlugin(ScrollTrigger);
    canvas.width=W*dpr; canvas.height=H*dpr;
    ctx.setTransform(dpr,0,0,dpr,0,0);
  }
+ /* Performance: Das Canvas ist per CSS display:none. Eine Dauerschleife mit
+    shadowBlur kostet sonst jedes Frame Haupt-Thread- und Raster-Zeit, ohne
+    sichtbar zu sein. Pausieren, solange es nicht gerendert wird; ein Resize
+    prueft erneut. */
+ let paused=false;
  function draw(){
+   if(!canvas.offsetParent){ paused=true; return; }
    t+=0.016;
    ctx.clearRect(0,0,W,H);
    const mobile=W<720;
@@ -107,7 +117,7 @@ gsap.registerPlugin(ScrollTrigger);
    requestAnimationFrame(draw);
  }
  resize();
- window.addEventListener('resize',resize,{passive:true});
+ window.addEventListener('resize',function(){ resize(); if(paused && canvas.offsetParent){ paused=false; draw(); } },{passive:true});
  ScrollTrigger.create({
    trigger:'#funnel',
    start:'top top',
@@ -1013,6 +1023,24 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
 
 
 
+/* Performance (2026-10-14): Die Controller V10-V14 (und der Canvas-Block oben)
+   bewegen per gescrubbtem ScrollTrigger nur noch Ebenen, die per CSS dauerhaft
+   unsichtbar sind (#heroToolLayer = reine Markup-Quelle, #funnelBadgeLayer,
+   #funnelCanvas, #funnelOutput). Sichtbar ist allein V34 (#toolBridgeLayer).
+   Gemessen: ~34 von ~42 Stil-Schreibzugriffen pro Scroll-Frame gingen an diese
+   unsichtbaren Ebenen. Deshalb hier genau die in diesem Block erzeugten
+   #hero/#funnel-Trigger mit onUpdate beenden. Markup und Init der alten
+   Versionen bleiben (V34 liest daraus die Badge-Quelle). */
+(function(){
+  if(!window.ScrollTrigger) return;
+  const before = window.__legacyStBefore || [];
+  window.ScrollTrigger.getAll().forEach(function(st){
+    if(before.indexOf(st) !== -1 || !st.vars || !st.vars.onUpdate || !st.trigger) return;
+    const id = st.trigger.id;
+    if(id === 'hero' || id === 'funnel') st.kill();
+  });
+})();
+
 /* ===== V34: erst Reihe, dann Text ausblenden + Reihe hoch, dann echter Funnel-Drop ===== */
 (function(){
   function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
@@ -1053,6 +1081,33 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
   const funnelVisual=document.getElementById('v33FunnelVisual');
   const portalGroup=funnelVisual ? funnelVisual.querySelector('.v33-funnel-portal-group') : null;
   const output=document.getElementById('funnelOutput');
+
+  /* Performance (2026-10-14): update() laeuft in jedem Scroll-Frame der ganzen
+     Seite. Bisher las es jedes Mal offsetTop/offsetHeight (erzwingt Layout,
+     wenn der GSAP-Ticker im selben Frame schon geschrieben hat) und schrieb
+     ~20 Werte, auch unveraenderte (Custom Properties auf .funnel-stage
+     invalidieren den ganzen Teilbaum). Jetzt: Masse gecacht und bei echten
+     Groessenaenderungen neu gemessen, nur geaenderte Werte schreiben.
+     Ergebnis identisch. */
+  const geo={heroStart:0,funnelStart:0,funnelHeight:0};
+  let finalApplied=false;
+  function measureGeo(){
+    if(!hero || !funnel) return;
+    geo.heroStart=hero.offsetTop;
+    geo.funnelStart=funnel.offsetTop;
+    geo.funnelHeight=funnel.offsetHeight;
+    finalApplied=false;
+  }
+  const written=new WeakMap();
+  function setVal(el,key,val,write){
+    let m=written.get(el);
+    if(!m){ m={}; written.set(el,m); }
+    if(m[key]===val) return;
+    m[key]=val;
+    write(val);
+  }
+  function setVar(el,name,val){ setVal(el,name,val,function(v){ el.style.setProperty(name,v); }); }
+  function setStyle(el,prop,val){ setVal(el,prop,val,function(v){ el.style[prop]=v; }); }
 
   /*
     Unter 960px richten sich die Icons an der tatsaechlichen Glasflaeche des
@@ -1172,7 +1227,10 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
     const chatToggle=document.querySelector('#aiAssistantWidget .ai-chat-toggle');
     if(chatToggle){
       const t=chatToggle.getBoundingClientRect();
-      if(t.width>0 && t.top>0) chat={l:t.left-8,t:t.top-8,r:t.right+8,b:t.bottom+8};
+      /* Unten fixiert: in die stabile Hoehe h umrechnen (iOS-Adressleiste,
+         siehe viewportHeight). Ohne Leistenwechsel ist dh=0. */
+      const dh=h-window.innerHeight;
+      if(t.width>0 && t.top>0) chat={l:t.left-8,t:t.top-8+dh,r:t.right+8,b:t.bottom+8+dh};
     }
 
     /* Ergebnis nur neu berechnen, wenn sich die Geometrie aendert — update()
@@ -1431,12 +1489,28 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
   }
 
   function apply(el,p,wave){
-    el.style.opacity=p.o.toFixed(3);
-    el.style.transform='translate3d('+p.x.toFixed(2)+'px,'+(p.y+(wave||0)).toFixed(2)+'px,'+p.z.toFixed(2)+'px) rotate('+p.r.toFixed(2)+'deg) scale('+p.s.toFixed(3)+')';
+    setStyle(el,'opacity',p.o.toFixed(3));
+    setStyle(el,'transform','translate3d('+p.x.toFixed(2)+'px,'+(p.y+(wave||0)).toFixed(2)+'px,'+p.z.toFixed(2)+'px) rotate('+p.r.toFixed(2)+'deg) scale('+p.s.toFixed(3)+')');
   }
 
   function lerpState(a,b,t){
     return {x:mix(a.x,b.x,t),y:mix(a.y,b.y,t),s:mix(a.s,b.s,t),r:mix(a.r,b.r,t),o:mix(a.o,b.o,t),z:mix(a.z,b.z,t)};
+  }
+
+  /*
+    iOS (2026-10-15): window.innerHeight aendert sich auf dem iPhone beim
+    Scroll-Richtungswechsel (Adressleiste faehrt ein/aus). Alle Positionen und
+    der Funnel-Fortschritt haengen an h — sie sprangen dann um die Leisten-
+    hoehe (Ruckeln genau beim Richtungswechsel). Auf Touch-Geraeten gilt die
+    Hoehe deshalb nur bei Breitenwechsel (Drehen) als neu, wie ScrollTriggers
+    ignoreMobileResize. Maus-Geraete (Desktop) lesen unveraendert live.
+  */
+  const touchViewport=!!(window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches);
+  let stableW=window.innerWidth, stableH=window.innerHeight;
+  function viewportHeight(){
+    const w=window.innerWidth;
+    if(!touchViewport || w!==stableW){ stableW=w; stableH=window.innerHeight; }
+    return stableH;
   }
 
   function update(){
@@ -1445,15 +1519,21 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
        nicht die echte Seitenposition. Zustand einfrieren statt falsch rechnen. */
     if(document.documentElement.classList.contains('services-experience-active')) { return; }
     const w=window.innerWidth;
-    const h=window.innerHeight;
+    const h=viewportHeight();
     const y=window.scrollY || window.pageYOffset || 0;
-    compactSlots = w<COMPACT_MAX ? compactHeroSlots(w,h) : null;
-    const heroStart=hero.offsetTop;
-    const funnelStart=funnel.offsetTop;
-    const funnelHeight=funnel.offsetHeight;
+    const heroStart=geo.heroStart;
+    const funnelStart=geo.funnelStart;
+    const funnelHeight=geo.funnelHeight;
     const travelEnd=funnelStart + h*.50;
     const travel=ease((y-heroStart-h*.04)/(travelEnd-heroStart));
     const inFunnel=clamp((y-funnelStart)/(Math.max(1,funnelHeight-h)),0,1);
+    /* Unterhalb des Funnels sind alle Werte konstant (travel=1, inFunnel=1):
+       einmal anwenden, danach nichts mehr rechnen oder schreiben. */
+    const atEnd = travel>=1 && inFunnel>=1;
+    if(atEnd && finalApplied) return;
+    /* Die Hero-Plaetze (teure Messung) zaehlen nur, solange travel<1 —
+       bei travel=1 ergibt lerpState exakt die Reihenposition. */
+    compactSlots = (w<COMPACT_MAX && travel<1) ? compactHeroSlots(w,h) : null;
 
     bridge.classList.toggle('is-past-hero', travel > .62 || y > funnelStart - h*.30);
 
@@ -1467,28 +1547,28 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
     bridge.classList.toggle('is-finished', finishFade < .03);
 
     if(funnelStage){
-      funnelStage.style.setProperty('--v34HeadOpacity',headOpacity.toFixed(3));
-      funnelStage.style.setProperty('--v34FunnelReveal',reveal.toFixed(3));
+      setVar(funnelStage,'--v34HeadOpacity',headOpacity.toFixed(3));
+      setVar(funnelStage,'--v34FunnelReveal',reveal.toFixed(3));
       // backward safety with older vars
-      funnelStage.style.setProperty('--v33FunnelTextOpacity',headOpacity.toFixed(3));
-      funnelStage.style.setProperty('--v33FunnelReveal',reveal.toFixed(3));
-      funnelStage.style.setProperty('--v15FunnelTextOpacity',headOpacity.toFixed(3));
-      funnelStage.style.setProperty('--v14FunnelTextOpacity',headOpacity.toFixed(3));
-      funnelStage.style.setProperty('--v13FunnelTextOpacity',headOpacity.toFixed(3));
-      funnelStage.style.setProperty('--v12FunnelTextOpacity',headOpacity.toFixed(3));
-      funnelStage.style.setProperty('--v15FunnelReveal',reveal.toFixed(3));
-      funnelStage.style.setProperty('--v14FunnelReveal',reveal.toFixed(3));
-      funnelStage.style.setProperty('--v13FunnelReveal',reveal.toFixed(3));
-      funnelStage.style.setProperty('--v12FunnelReveal',reveal.toFixed(3));
+      setVar(funnelStage,'--v33FunnelTextOpacity',headOpacity.toFixed(3));
+      setVar(funnelStage,'--v33FunnelReveal',reveal.toFixed(3));
+      setVar(funnelStage,'--v15FunnelTextOpacity',headOpacity.toFixed(3));
+      setVar(funnelStage,'--v14FunnelTextOpacity',headOpacity.toFixed(3));
+      setVar(funnelStage,'--v13FunnelTextOpacity',headOpacity.toFixed(3));
+      setVar(funnelStage,'--v12FunnelTextOpacity',headOpacity.toFixed(3));
+      setVar(funnelStage,'--v15FunnelReveal',reveal.toFixed(3));
+      setVar(funnelStage,'--v14FunnelReveal',reveal.toFixed(3));
+      setVar(funnelStage,'--v13FunnelReveal',reveal.toFixed(3));
+      setVar(funnelStage,'--v12FunnelReveal',reveal.toFixed(3));
     }
     if(funnelVisual){
-      funnelVisual.style.setProperty('--show', reveal.toFixed(3));
-      funnelVisual.style.setProperty('--power', basePower.toFixed(3));
+      setVar(funnelVisual,'--show', reveal.toFixed(3));
+      setVar(funnelVisual,'--power', basePower.toFixed(3));
     }
     if(output){
-      output.style.opacity='0';
-      output.style.visibility='hidden';
-      output.style.display='none';
+      setStyle(output,'opacity','0');
+      setStyle(output,'visibility','hidden');
+      setStyle(output,'display','none');
     }
 
     /* Extra-Pulse: jedes Element, das unten ankommt, lässt den Portal-Glow kurz stärker aufleuchten */
@@ -1505,12 +1585,12 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
     pulse = clamp(pulse,0,.65);
     const power = clamp(basePower + pulse,0,1);
     if(funnelVisual){
-      funnelVisual.style.setProperty('--power', power.toFixed(3));
+      setVar(funnelVisual,'--power', power.toFixed(3));
     }
     if(portalGroup){
       const sc=(.96 + power*.18 + pulse*.06).toFixed(3);
-      portalGroup.style.transform='scale('+sc+')';
-      portalGroup.style.opacity=(.78 + power*.20).toFixed(3);
+      setStyle(portalGroup,'transform','scale('+sc+')');
+      setStyle(portalGroup,'opacity',(.78 + power*.20).toFixed(3));
     }
 
     badges.forEach(function(b,i){
@@ -1579,7 +1659,7 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
       apply(b,state, reallyGone ? 0 : (waveHero+waveRow));
       /* Performance: kein dynamischer CSS-filter pro Icon/Frame */
     });
-
+    finalApplied = atEnd;
   }
 
   let ticking=false;
@@ -1592,12 +1672,27 @@ document.querySelectorAll('.engine-card,.auto-card,.contact-card').forEach(el=>{
     });
   }
 
+  /* Integrationsschnittstelle (2026-10-15): der native Mobile-Adapter
+     (src/legacy/funnelNativeTimeline.js) stoesst V34 direkt an, statt globale
+     scroll-Events auszuloesen. Keine Aenderung an Formeln oder Ablauf. */
+  window.__v34FunnelHook={schedule:scheduleUpdate, badges:badges};
+
+  function remeasure(){ measureGeo(); scheduleUpdate(); }
+  measureGeo();
   window.addEventListener('scroll', scheduleUpdate, {passive:true});
-  window.addEventListener('resize', scheduleUpdate, {passive:true});
-  window.addEventListener('orientationchange', scheduleUpdate, {passive:true});
+  window.addEventListener('resize', remeasure, {passive:true});
+  window.addEventListener('orientationchange', remeasure, {passive:true});
   /* Mobile-Plaetze haengen an der Groesse der Hero-Headline: nach dem Laden
      der Webfonts einmal neu messen. */
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleUpdate);
-  window.addEventListener('load', scheduleUpdate);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
+  window.addEventListener('load', remeasure);
+  /* Masse aktuell halten: ScrollTrigger-Refresh und Groessenaenderungen von
+     Hero/Funnel (die einzigen Bloecke, die deren Position bestimmen). */
+  if(window.ScrollTrigger) window.ScrollTrigger.addEventListener('refresh', remeasure);
+  if(window.ResizeObserver){
+    const ro=new ResizeObserver(remeasure);
+    if(hero) ro.observe(hero);
+    if(funnel) ro.observe(funnel);
+  }
   scheduleUpdate();
 })();

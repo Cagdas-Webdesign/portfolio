@@ -751,6 +751,22 @@ a,button{cursor:pointer}
   visibility:hidden !important;
   pointer-events:none !important;
 }
+/* Performance (2026-10-14): Beide Layer sind nur noch Markup-Quelle fuer die
+   Bruecke (V34 liest Bild, Text und --ring). Ihr Inhalt hielt trotzdem 14
+   Dauer-Rotationen (v10BadgeSpin), 14 will-change-Ebenen und Backdrop-Blur
+   aktiv — GPU-Arbeit und -Speicher ohne sichtbares Ergebnis. */
+#heroToolLayer *,
+#heroToolLayer *::before,
+#heroToolLayer *::after,
+#funnelBadgeLayer *,
+#funnelBadgeLayer *::before,
+#funnelBadgeLayer *::after{
+  animation:none !important;
+  will-change:auto !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  visibility:hidden !important;
+}
 
 /* Ein einziger globaler Layer trägt die Elemente durch den Scroll */
 .tool-bridge-layer{
@@ -11515,3 +11531,34 @@ body.cert-focus .ai-cert-shell{
   .v27-product-c,.v27-product-d{display:none}.v27-checkout-card{width:218px}.v27-system-lines{transform:scale(.92);transform-origin:center}.v27-node{width:70px;height:64px}.v27-node b{font-size:14px}.v27-node span{font-size:9px}.v27-status-card b{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){#portfolio-nested-offers .v27-visual *,#portfolio-nested-offers .v27-visual::before{animation:none !important;}}
+
+/* Mobile/Touch (2026-10-15, freigegebene Variante F): Namensblock (78 px) sass
+   linksbuendig im 98-px-Badge — Text 10 px links der Ringmitte. Nur
+   zentrieren; Breite, Umbruch und Hoehe (von V34 vermessen) unveraendert. */
+@media (hover: none) and (pointer: coarse) {
+  .tool-bridge-layer .tool-bridge-name{margin-left:auto !important;margin-right:auto !important;text-align:center !important;}
+}
+/* Touch mit Scroll-Timeline: Kreis-Ebene ab dem ersten Frame verborgen, bis
+   src/legacy/funnelNativeTimeline.js sie mit korrekter Position freigibt
+   (is-native-ready; bei jedem Abbruch sofort). Desktop/ohne Support: nie aktiv. */
+@media (hover: none) and (pointer: coarse) {
+  @supports (animation-timeline: scroll()) {
+    .tool-bridge-layer:not(.is-native-ready){opacity:0 !important;}
+    /* Solange der native Adapter die Kreise verwaltet (Start, Berechnung,
+       aktiv), keine 0,22-s-Transition: sie liess die Kreise von oben links
+       hereingleiten und folgte waehrend der Berechnung virtuellen Zwischen-
+       werten (Nachrutschen). Im V34-Fallback gilt die Transition weiter. */
+    .tool-bridge-layer:not(.is-native-ready) .tool-bridge-badge,
+    .tool-bridge-layer.is-native-sampling .tool-bridge-badge,
+    .tool-bridge-layer.is-native .tool-bridge-badge{transition:none !important;}
+  }
+}
+
+/* iPhone-A/B-Test bestaetigt (2026-10-15, Variante B): eigene Zeichenebene
+   fuer den Funnel-Hintergrund — keine schwarze Flaeche beim sofortigen
+   Scrollen. Nur Touch; Desktop unveraendert. */
+@media (hover: none) and (pointer: coarse) {
+  #funnel {
+    will-change: transform;
+  }
+}

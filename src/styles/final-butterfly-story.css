@@ -180,11 +180,21 @@
   z-index: 2;
 }
 
+.final-butterfly-story .banner-tree picture,
 .final-butterfly-story .banner-tree img,
 .final-butterfly-story .banner-tree video {
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* iOS blendet bei blockiertem Autoplay einen eigenen Play-Button ein. Das
+   Video ist Dekoration ohne Bedienelemente — die Story startet es selbst
+   (bei Bedarf beim naechsten Antippen, siehe FinalButterflyStory.jsx). */
+.final-butterfly-story .banner-tree video::-webkit-media-controls-start-playback-button,
+.final-butterfly-story .banner-tree video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  -webkit-appearance: none;
 }
 
 /* ---------- Wings (großer SVG-Schmetterling) ---------- */
@@ -523,6 +533,12 @@
      Timeline-Zoom bleibt dadurch das Blütenzentrum im Hochformat sichtbar. */
   .final-butterfly-story .banner-tree {
     bottom: 20svh;
+    /* Kurze Hochformat-Viewports (iPhone mit Browserleisten): Die Krone liegt
+       bei ca. 100svh - bottom - 103.5vw (Breite 200vw, Story-Zoom 2.05,
+       yPercent 63). Text endet bei ca. 16.5svh + 95px. Baum nur so weit
+       absenken, dass ~30px Abstand bleiben; auf hohen Viewports greift
+       weiterhin 20svh (unveraendert). */
+    bottom: min(20svh, max(-20svh, calc(83.5svh - 125px - 103.5vw)));
     width: 200vw;
     max-width: none;
   }

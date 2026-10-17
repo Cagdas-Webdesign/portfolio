@@ -7,6 +7,17 @@ import { CustomEase } from 'gsap/CustomEase';
 
 gsap.registerPlugin(ScrollTrigger, SplitText, DrawSVGPlugin, CustomEase);
 
+/*
+ * iPhone (2026-10-16): Das transparente 4K-Baumvideo zeigte dort (Firefox
+ * iOS) sporadisch den nativen Play-Button. iPhones erhalten deshalb statt
+ * des Videos ein Standbild desselben Films (Frame bei 2,5 s, volle
+ * 3840x2160-Leinwand mit Alpha -> identische Geometrie). Ohne <video> wird
+ * der Film weder angefragt noch dekodiert; die Wiedergabesteuerung unten
+ * bleibt ohne videoRef wirkungslos. Timeline, Pin und Schmetterling sind
+ * unveraendert. Desktop und alle anderen Geraete rendern weiter das Video.
+ */
+const IS_IPHONE = typeof navigator !== 'undefined' && /iPhone|iPod/.test(navigator.userAgent);
+
 // FreeFrontend/Zajno "Cicada" Schmetterlings-Story, 1:1 als React-Integration.
 // Original: fixed-Layer + main{height:10000px}; hier: gepinnte Stage innerhalb
 // einer eigenen Scrollstrecke. Header, Sound und Audio der Vorlage entfernt.
@@ -42,19 +53,107 @@ export default function FinalButterflyStory() {
       // Video immer stumm (React rendert das muted-Attribut nicht zuverlässig).
       // Es läuft nur, solange es in dieser Story tatsächlich sichtbar sein kann.
       const video = videoRef.current;
-      const playVideo = () => {
+      /*
+       * Wiedergabe als EIN Soll-Zustand (wantsPlay) mit einem Abgleich
+       * (syncVideo) — Story-Callbacks setzen nur noch den Sollwert.
+       *
+       * iOS (2026-10-16): Der Baum blieb dort wiederholt bei 0 s stehen
+       * (readyState 4, pausiert, Play-Button). Ursachen im alten Ablauf:
+       *  - Nur NotAllowedError wurde nachgeholt; jede andere Ablehnung
+       *    (z. B. AbortError, wenn ein pause() den laufenden Start abbricht)
+       *    liess das Video dauerhaft stehen.
+       *  - Der Nachhol-Listener reagierte auf das touchend einer Wischgeste.
+       *    Das ist in WebKit keine Nutzeraktivierung: play() scheiterte
+       *    erneut, ein echtes Antippen wurde so oft verpasst.
+       *  - Pausierte iOS das Video selbst (App-/Tabwechsel, bfcache,
+       *    Stromsparen), startete es niemand neu: innerhalb der gepinnten
+       *    Story feuert kein onEnter mehr.
+       * Jetzt: jeder Fehlschlag wird nachgeholt — beim naechsten echten
+       * Antippen (click/keydown) bzw. sobald Daten/Sichtbarkeit zurueck
+       * sind. Die Listener bleiben, bis ein Start tatsaechlich gelingt.
+       */
+      let wantsPlay = false;
+      let playPending = false;
+      let retryArmed = false;
+      let lastAutoRetry = 0;
+      const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+      const RETRY_EVENTS = ['click', 'keydown'];
+      const onUserActivation = () => syncVideo();
+      const disarmRetry = () => {
+        if (!retryArmed) return;
+        retryArmed = false;
+        RETRY_EVENTS.forEach((type) => document.removeEventListener(type, onUserActivation, true));
+      };
+      const armRetry = () => {
+        if (retryArmed) return;
+        retryArmed = true;
+        RETRY_EVENTS.forEach((type) => document.addEventListener(type, onUserActivation, true));
+      };
+      function syncVideo() {
         if (!video) return;
+        if (!wantsPlay) {
+          disarmRetry();
+          if (!video.paused) video.pause();
+          return;
+        }
+        if (!video.paused || playPending) return;
         const playPromise = video.play();
-        if (playPromise && playPromise.catch) playPromise.catch(() => {});
+        if (!playPromise || !playPromise.then) return;
+        playPending = true;
+        playPromise.then(() => {
+          playPending = false;
+          disarmRetry();
+          // Waehrend des Starts wurde pausiert gewuenscht: jetzt anwenden.
+          if (!wantsPlay) syncVideo();
+        }, () => {
+          playPending = false;
+          if (wantsPlay) armRetry();
+        });
+      }
+      const playVideo = () => {
+        wantsPlay = true;
+        syncVideo();
       };
       const pauseVideo = () => {
-        if (video && !video.paused) video.pause();
+        wantsPlay = false;
+        if (!playPending) syncVideo();
+        else disarmRetry();
+      };
+      // Touch: vom System pausiert oder Daten nachgeladen -> erneut abgleichen
+      // (hoechstens einmal pro Sekunde, damit WebKit-Pausen keine Schleife bilden).
+      const resumeIfWanted = () => {
+        if (!wantsPlay || !video?.paused || document.visibilityState !== 'visible') return;
+        const now = performance.now();
+        if (now - lastAutoRetry < 1000) {
+          armRetry();
+          return;
+        }
+        lastAutoRetry = now;
+        syncVideo();
+      };
+      const mediaCleanups = [];
+      const listen = (target, type, fn) => {
+        target.addEventListener(type, fn);
+        mediaCleanups.push(() => target.removeEventListener(type, fn));
       };
 
       if (video) {
         video.muted = true;
         video.defaultMuted = true;
         pauseVideo();
+        /*
+         * iOS (gemessen in Firefox iOS: geladen, readyState 4, pausiert bei
+         * 0 s): Das native autoplay greift dort nicht. Touch-Geraete starten
+         * daher wie der Desktop sofort (stumm, inline).
+         */
+        if (isTouchDevice) {
+          video.setAttribute('muted', '');
+          video.setAttribute('playsinline', '');
+          ['pause', 'canplay'].forEach((type) => listen(video, type, resumeIfWanted));
+          listen(document, 'visibilitychange', resumeIfWanted);
+          listen(window, 'pageshow', resumeIfWanted);
+          playVideo();
+        }
       }
 
       let hoverActive = false;
@@ -480,6 +579,9 @@ export default function FinalButterflyStory() {
 
       return () => {
         cancelled = true;
+        wantsPlay = false;
+        disarmRetry();
+        mediaCleanups.forEach((fn) => fn());
         listenerCleanups.forEach((fn) => fn());
         context?.revert();
         splitInstances.forEach((instance) => instance.revert());
@@ -519,19 +621,32 @@ export default function FinalButterflyStory() {
           <div className="banner-subtitle banner-slide split">Digitale Systeme für morgen</div>
           <div className="banner-text banner-slide split">Jede starke Lösung beginnt mit einer klaren Idee. Durch Design, Technologie und Automation entsteht daraus ein System, das Unternehmen sichtbar macht, Prozesse vereinfacht und nachhaltig wachsen kann.</div>
           <div className="banner-tree">
-            <video
-              ref={videoRef}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              width="3840"
-              height="2160"
-            >
-              <source src={`${import.meta.env.BASE_URL}assets/final-butterfly/cicada_tree.mov`} type={'video/mp4; codecs="hvc1"'} />
-              <source src={`${import.meta.env.BASE_URL}assets/final-butterfly/cicada_tree.webm`} type="video/webm" />
-            </video>
+            {IS_IPHONE ? (
+              <picture>
+                <source srcSet={`${import.meta.env.BASE_URL}assets/final-butterfly/cicada_tree_still.avif`} type="image/avif" />
+                <img
+                  src={`${import.meta.env.BASE_URL}assets/final-butterfly/cicada_tree_still.png`}
+                  alt=""
+                  width="3840"
+                  height="2160"
+                  decoding="async"
+                />
+              </picture>
+            ) : (
+              <video
+                ref={videoRef}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                width="3840"
+                height="2160"
+              >
+                <source src={`${import.meta.env.BASE_URL}assets/final-butterfly/cicada_tree.mov`} type={'video/mp4; codecs="hvc1"'} />
+                <source src={`${import.meta.env.BASE_URL}assets/final-butterfly/cicada_tree.webm`} type="video/webm" />
+              </video>
+            )}
           </div>
         </div>
         <div className="wings">

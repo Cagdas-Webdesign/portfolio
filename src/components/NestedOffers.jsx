@@ -143,18 +143,22 @@ export default function NestedOffers() {
     const nextIndex = clamp(Math.round(progress), 0, SERVICES.length - 1);
     const viewportCenter = viewport.scrollLeft + (viewport.clientWidth / 2);
 
-    section.style.setProperty('--sc-page-position', progress.toFixed(4));
-
-    cardRefs.current.forEach((card) => {
-      if (!card) return;
+    // Erst alle Masse lesen, dann schreiben: Ein Schreibzugriff vor dem
+    // Lesen (Custom Property auf der Section) erzwang pro Wisch-Frame eine
+    // synchrone Stil- und Layoutberechnung.
+    const scales = cardRefs.current.map((card) => {
+      if (!card) return null;
       const cardCenter = card.offsetLeft + (card.offsetWidth / 2);
       const distance = Math.min(
         Math.abs((cardCenter - viewportCenter) / Math.max(card.offsetWidth, 1)),
         1.2,
       );
-      const scale = reducedMotion ? 1 : 1.012 - (distance * 0.022);
+      return reducedMotion ? 1 : 1.012 - (distance * 0.022);
+    });
 
-      card.style.setProperty('--sc-card-scale', scale.toFixed(4));
+    section.style.setProperty('--sc-page-position', progress.toFixed(4));
+    cardRefs.current.forEach((card, index) => {
+      if (card) card.style.setProperty('--sc-card-scale', scales[index].toFixed(4));
     });
 
     if (nextIndex !== activeIndexRef.current) {
@@ -243,6 +247,16 @@ export default function NestedOffers() {
     };
   }, [cancelScrollTween, requestCarouselUpdate]);
 
+  // Zurueckgestellte Entsperrung (nur mobil, waehrend der Ausfahrt)
+  const deferUnlockRef = useRef(false);
+  const pendingUnlockRef = useRef(null);
+  const flushPendingUnlock = useCallback(() => {
+    const unlock = pendingUnlockRef.current;
+    pendingUnlockRef.current = null;
+    unlock?.();
+  }, []);
+  useEffect(() => flushPendingUnlock, [flushPendingUnlock]);
+
   /*
    * Seitenzustand während einer geöffneten Leistungsansicht.
    *
@@ -255,6 +269,9 @@ export default function NestedOffers() {
    */
   useEffect(() => {
     if (selectedIndex === null) return undefined;
+    // Eine noch zurueckgestellte Entsperrung (Ausfahrt laeuft) zuerst
+    // abschliessen — sonst merkte sich diese Sperre den gesperrten Zustand.
+    flushPendingUnlock();
 
     const html = document.documentElement;
     const root = document.getElementById('root');
@@ -321,7 +338,7 @@ export default function NestedOffers() {
       root.setAttribute('aria-hidden', 'true');
     }
 
-    return () => {
+    const unlock = () => {
       if (root) {
         root.inert = previous.rootInert ?? false;
         if (previous.rootAriaHidden === null) root.removeAttribute('aria-hidden');
@@ -343,7 +360,23 @@ export default function NestedOffers() {
 
       trigger?.focus({ preventScroll: true });
     };
-  }, [selectedIndex]);
+
+    return () => {
+      /*
+       * Mobile (2026-10-15): Wie Impressum/Datenschutz bleibt die Seite
+       * gesperrt, bis die Ausfahrt beendet ist. Das Entsperren (body-Position,
+       * scrollTo, Trigger reaktivieren) erzwingt auf dem iPhone Relayout und
+       * Repaint der ganzen Seite — lief es im ersten Frame der Ausfahrt,
+       * verschwand das Pop-up abrupt. Desktop entsperrt unveraendert sofort.
+       */
+      if (deferUnlockRef.current) {
+        deferUnlockRef.current = false;
+        pendingUnlockRef.current = unlock;
+        return;
+      }
+      unlock();
+    };
+  }, [selectedIndex, flushPendingUnlock]);
 
   /*
    * Deterministischer Exit ueber einen statischen Schnappschuss.
@@ -372,6 +405,7 @@ export default function NestedOffers() {
 
   const openExperience = useCallback((index, trigger, source = 'popup-navigation') => {
     setOpenSource(source);
+    flushPendingUnlock();
     removeSnapshot();
     closingRef.current = false;
     // Framer kann einen noch ausfahrenden Knoten wiederverwenden (gleicher
@@ -381,7 +415,7 @@ export default function NestedOffers() {
     });
     returnFocusRef.current = trigger;
     setSelectedIndex(index);
-  }, [removeSnapshot]);
+  }, [flushPendingUnlock, removeSnapshot]);
 
   const closeExperience = useCallback(() => {
     if (closingRef.current) return;
@@ -444,15 +478,26 @@ export default function NestedOffers() {
       );
       const fade = snapshot.animate([{ opacity: 1 }, { opacity: 0 }], { duration, easing: 'ease', fill: 'forwards' });
       const done = () => {
-        if (snapshotRef.current === snapshot) removeSnapshot();
+        if (snapshotRef.current !== snapshot) return;
+        flushPendingUnlock();
+        removeSnapshot();
       };
+      // Nur mobil: Entsperren erst nach der Ausfahrt (siehe Sperr-Effekt)
+      deferUnlockRef.current = isMobileExperience && !reducedMotion;
       fade.onfinish = done;
-      // Fallback, falls keine Frames laufen (verstecktes Tab)
-      window.setTimeout(done, duration + 250);
+      /*
+       * Fallback, falls keine Frames laufen (verstecktes Tab). Fix
+       * (2026-10-15): Der Timer startet erst, wenn die Ausfahrt tatsaechlich
+       * laeuft. Vorher lief er ab dem Klick — auf dem iPhone verbrauchten
+       * Klonen, Entsperren und Trigger-Reaktivierung einen Grossteil der
+       * 700 ms, die Kopie verschwand mitten in der Animation (abrupt).
+       */
+      fade.ready.then(() => window.setTimeout(done, duration + 250), done);
+      window.setTimeout(done, duration + 3000);
     }
 
     setSelectedIndex(null);
-  }, [reducedMotion, removeSnapshot]);
+  }, [flushPendingUnlock, isMobileExperience, reducedMotion, removeSnapshot]);
 
   useEffect(() => removeSnapshot, [removeSnapshot]);
 

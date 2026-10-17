@@ -750,6 +750,20 @@
 /* Handy: KI-Zeichen in den Kaestchen groesser (Kaestchen selbst unveraendert),
    damit es auf kleinen Displays klar erkennbar bleibt. Desktop unveraendert. */
 @media (max-width: 700px) {
+  /* 28px. Ausrichtung ohne Schaetzwert: Die Box wird auf Versalhoehe und
+     Grundlinie der Schrift beschnitten, so liegen Zeichen und Text auf
+     derselben Mitte — unabhaengig von den Metriken der Ersatzschrift.
+     Ohne text-box-Unterstuetzung bleibt die bisherige 1px-Korrektur. */
+  .rx-cta .rx-cta__mark { font-size: 28px; transform: translateY(-1px); }
+  @supports (text-box: trim-both cap alphabetic) {
+    .rx-cta .rx-cta__mark { display: block; text-box: trim-both cap alphabetic; transform: none; }
+  }
+  /* iOS zeichnet das ✦ aus einer Ersatzschrift kleiner und tiefer: im
+     iPhone-Screenshot lag seine Mitte 2,1px unter der Versalmitte des Texts
+     (Referenz „Open Repository“: Icon auf Versalmitte). Nur iOS-WebKit. */
+  @supports (text-box: trim-both cap alphabetic) and (-webkit-touch-callout: none) {
+    .rx-cta .rx-cta__mark { transform: translateY(-2px); }
+  }
   .rx-ask .rx-ask__mark { font-size: 18px; }
   .rx-ask--compact .rx-ask__mark { font-size: 16px; }
 }
@@ -2736,6 +2750,7 @@
 .rx-arch__conduit::after,
 .rx-arch__port::after { transition: border-color 400ms ease; }
 
+
 /* ---------- Technologie-Logos (offiziell, monochrom) ---------- */
 
 .rx-arch__tech {
@@ -2857,10 +2872,10 @@
   .rx-rel__tabs.rx-tabbar > button.is-selected { border-color: rgba(111, 211, 160, 0.6); }
 
   /* Scroll-Laenge: Sticky-Buehne kleiner, mehr sichtbarer Kontext darunter */
-  .rx-canvas { width: min(100%, 38dvh); }
-  .rx-dive__progress { width: min(100%, 38dvh); }
-  .rx-step { min-height: 40dvh; }
-  .rx-dive__steps { padding-bottom: 30dvh; }
+  .rx-canvas { width: min(100%, 38svh); }
+  .rx-dive__progress { width: min(100%, 38svh); }
+  .rx-step { min-height: 40svh; }
+  .rx-dive__steps { padding-bottom: 30svh; }
 
   .rx-arch__logo { width: 88px; height: 88px; margin-top: -68px; }
   .rx-arch__mark { font-size: 28px; }
@@ -2911,6 +2926,30 @@
   .rx-arch__core-row > *,
   .rx-arch__stack > * {
     transition: opacity 400ms ease, border-color 400ms ease, box-shadow 400ms ease;
+  }
+}
+
+/* Touch (2026-10-16): Jeder Trace-Schrittwechsel startete hier ~60 Mal-
+   Uebergaenge (Rahmenfarben, Hintergruende, Glows bis 90px Unschaerfe am
+   Core). Auf iOS malt das der Haupt-Thread 300–520ms lang neu, waehrend der
+   Compositor scrollt — jeder Richtungswechsel an „Eigene Systemlogik“ startet
+   sie erneut. Touch wechselt diese Werte daher sofort; nur Deckkraft blendet
+   weiter. Endzustaende und Desktop unveraendert. */
+@media (hover: none) and (pointer: coarse) {
+  .rx-arch > *,
+  .rx-arch__core-row > *,
+  .rx-arch__stack > *,
+  .rx-arch__module,
+  .rx-arch .rx-arch__conduit,
+  .rx-arch .rx-arch__port {
+    transition-property: opacity;
+  }
+
+  .rx-arch__logo,
+  .rx-arch__conduit::before,
+  .rx-arch__conduit::after,
+  .rx-arch__port::after {
+    transition: none;
   }
 }
 

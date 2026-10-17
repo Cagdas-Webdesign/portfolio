@@ -199,12 +199,18 @@ export function useAssistantFullscreen(panelRef, backdropRef, messagesRef) {
 
   // Seite dahinter nicht scrollen. scrollbar-gutter haelt den Platz der
   // Scrollleiste frei, damit das angedockte Widget beim Zurueckkehren nicht springt.
+  // Die Sperre sitzt auf <body>, nicht auf <html>: Solange <html> overflow:
+  // visible behaelt, wird der body-Wert auf den Viewport uebertragen und
+  // <body> wird kein eigener Scrollcontainer. Mit der Sperre auf <html> wurde
+  // er es (wegen body { overflow-x: hidden }) — sticky Elemente verloren ihren
+  // Bezug, und je nach Browser stimmte die Scrollposition danach nicht mehr.
   useEffect(() => {
     if (!fullscreen) return undefined;
     const html = document.documentElement;
-    const previous = { overflow: html.style.overflow, gutter: html.style.scrollbarGutter };
+    const { body } = document;
+    const previous = { overflow: body.style.overflow, gutter: html.style.scrollbarGutter };
     if (window.innerWidth > html.clientWidth) html.style.scrollbarGutter = 'stable';
-    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
 
     const backdrop = backdropRef.current;
     const block = (event) => event.preventDefault();
@@ -212,7 +218,7 @@ export function useAssistantFullscreen(panelRef, backdropRef, messagesRef) {
     backdrop?.addEventListener('touchmove', block, { passive: false });
 
     return () => {
-      html.style.overflow = previous.overflow;
+      body.style.overflow = previous.overflow;
       html.style.scrollbarGutter = previous.gutter;
       backdrop?.removeEventListener('wheel', block);
       backdrop?.removeEventListener('touchmove', block);
